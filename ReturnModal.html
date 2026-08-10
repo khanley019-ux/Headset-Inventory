@@ -1,0 +1,190 @@
+<div id="returnHeadsetModal" class="modal" style="display:none;">
+
+  <div class="modal-content">
+
+    <div class="modal-header">
+
+      <h2>Return Headset</h2>
+
+      <button
+        class="modal-close"
+        onclick="closeReturnHeadsetModal()">
+
+        <span class="material-icons-outlined">
+          close
+        </span>
+
+      </button>
+
+    </div>
+
+
+    <div class="modal-body">
+
+      <div class="form-group">
+
+        <label>Date Returned</label>
+
+        <input
+          type="date"
+          id="returnDate"
+          readonly>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>Asset ID</label>
+
+        <div style="display:flex; gap:8px;">
+
+          <input
+            type="text"
+            id="returnAssetId"
+            placeholder="Enter Asset ID (e.g. HS-0143)"
+            autocomplete="off"
+            style="flex:1;">
+
+          <button
+            type="button"
+            class="btn-secondary"
+            onclick="searchReturnAsset()">
+
+            <span class="material-icons-outlined">
+              search
+            </span>
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>Agent Name</label>
+
+        <input
+          type="text"
+          id="returnAgentName"
+          readonly
+          placeholder="Automatically filled">
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>Headset Brand</label>
+
+        <input
+          type="text"
+          id="returnHeadsetBrand"
+          readonly
+          placeholder="Automatically filled">
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>Current Status</label>
+
+        <input
+          type="text"
+          id="returnCurrentStatus"
+          readonly
+          placeholder="Automatically filled">
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>Status Upon Return</label>
+
+        <select id="returnStatus">
+
+          <option value="">
+            Select Status
+          </option>
+
+          <option value="Good">
+            Good
+          </option>
+
+          <option value="New">
+            New
+          </option>
+
+          <option value="Fair">
+            Fair
+          </option>
+
+          <option value="Damaged">
+            Damaged
+          </option>
+
+          <option value="Lost">
+            Lost
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>Checked By</label>
+
+        <input
+          type="text"
+          id="returnCheckedBy"
+          placeholder="Enter your name"
+          autocomplete="off">
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>Remarks</label>
+
+        <textarea
+          id="returnRemarks"
+          rows="3"
+          placeholder="Enter remarks (optional)"></textarea>
+
+      </div>
+
+    </div>
+
+
+    <div class="modal-footer">
+
+      <button
+        class="btn-secondary"
+        onclick="closeReturnHeadsetModal()">
+
+        Cancel
+
+      </button>
+
+
+      <button
+        class="btn-primary"
+        id="btnReturnHeadset"
+        onclick="saveReturnHeadset()">
+
+        Return Headset
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

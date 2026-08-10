@@ -1,0 +1,117 @@
+<div id="borrowHeadsetModal" class="modal" style="display:none;">
+
+  <div class="modal-content">
+
+    <div class="modal-header">
+
+      <h2>Borrow Headset</h2>
+
+      <button
+        class="modal-close"
+        onclick="closeBorrowHeadsetModal()">
+
+        <span class="material-icons-outlined">
+          close
+        </span>
+
+      </button>
+
+    </div>
+
+
+    <div class="modal-body">
+
+      <div class="form-group">
+
+        <label>Agent Name</label>
+
+        <input
+          type="text"
+          id="borrowAgentName"
+          placeholder="Enter Agent Name"
+          autocomplete="off">
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>Asset ID</label>
+
+        <select id="borrowAssetId">
+
+          <option value="">
+            Select Asset ID
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>Headset Brand</label>
+
+        <input
+          type="text"
+          id="borrowHeadsetBrand"
+          readonly
+          placeholder="Automatically filled">
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>Issued By</label>
+
+        <input
+          type="text"
+          id="borrowIssuedBy"
+          placeholder="Enter your name"
+          autocomplete="off">
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>Status</label>
+
+        <input
+          type="text"
+          value="Borrowed"
+          readonly>
+
+      </div>
+
+
+    </div>
+
+
+    <div class="modal-footer">
+
+      <button
+        class="btn-secondary"
+        onclick="closeBorrowHeadsetModal()">
+
+        Cancel
+
+      </button>
+
+
+      <button
+        class="btn-primary"
+        id="btnSaveBorrowHeadset"
+        onclick="saveBorrowHeadset()">
+
+        Borrow Headset
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

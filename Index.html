@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <base target="_top">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+  <?!= include("Styles"); ?>
+
+</head>
+
+<body>
+
+  <div id="login-container">
+    <?!= include("Home"); ?>
+  </div>
+
+  <div id="app-layout" style="display:none;">
+
+    <?!= include("Sidebar"); ?>
+
+    <div class="main-content">
+
+      <?!= include("Topbar"); ?>
+
+      <main id="page-content">
+        <?!= include("Dashboard"); ?> <?!= include("Inventory"); ?>
+      </main>
+
+    </div>
+
+  </div>
+
+  <?!= include("Scripts"); ?>
+  <?!= include("IssueHeadsetModal"); ?>
+  <?!= include("AddHeadsetModal"); ?>
+  <?!= include('Dashboard.js.html'); ?>
+  <?!= include('Inventory.js.html'); ?>
+  <?!= include('BorrowModal.html'); ?>
+  <?!= include('ReturnModal.html'); ?>
+
+</body>
+
+</html>

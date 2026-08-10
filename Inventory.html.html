@@ -1,0 +1,136 @@
+<div id="inventory-page" class="page" style="display:none;">
+
+  <div class="page-header">
+
+    <div>
+      <h1>Inventory</h1>
+      <p>Manage all headset assets</p>
+    </div>
+
+    <button
+      class="btn-primary"
+      id="btnAddHeadset"
+      onclick="openAddHeadsetModal()">
+
+      <span class="material-icons-outlined">
+        add
+      </span>
+
+      Add Headset
+
+    </button>
+
+
+    <button
+      class="btn-primary"
+      onclick="openIssueHeadsetModal()">
+
+      <span class="material-icons-outlined">
+        assignment_returned
+      </span>
+
+      Issue Headset
+
+    </button>
+
+
+    <button
+      class="btn-primary"
+      onclick="openBorrowHeadsetModal()">
+
+      <span class="material-icons-outlined">
+        headphones
+      </span>
+
+      Borrow Headset
+
+    </button>
+
+
+    <button
+      class="btn-primary"
+      onclick="openReturnHeadsetModal()">
+
+      <span class="material-icons-outlined">
+        assignment_return
+      </span>
+
+      Return Headset
+
+    </button>
+
+  </div>
+
+<div class="inventory-toolbar">
+
+  <div class="inventory-search">
+
+    <span class="material-icons-outlined">
+      search
+    </span>
+
+    <input
+      type="text"
+      id="inventorySearch"
+      placeholder="Search Asset ID, Brand, Model, or Serial Number..."
+      oninput="searchInventory()">
+
+  </div>
+
+
+  <div class="inventory-filter">
+
+    <span class="material-icons-outlined">
+      filter_list
+    </span>
+
+    <select
+      id="inventoryStatusFilter"
+      onchange="filterInventory()">
+
+      <option value="">All Status</option>
+      <option value="Available">Available</option>
+      <option value="Assigned">Assigned</option>
+      <option value="Under Repair">Under Repair</option>
+      <option value="Damaged">Damaged</option>
+      <option value="Lost">Lost</option>
+      <option value="Borrowed">Borrowed</option>
+
+    </select>
+
+  </div>
+
+</div>
+
+  <div class="table-container" style="overflow:auto;">
+
+    <table id="inventoryTable" class="inventory-table">
+
+      <thead>
+
+        <tr>
+
+          <th>Asset ID</th>
+          <th>Brand</th>
+          <th>Model</th>
+          <th>Serial Number</th>
+          <th>Status</th>
+          <th>Condition</th>
+          <th>Assigned To</th>
+          <th style="text-align:center;">Action</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+      </tbody>
+
+    </table>
+
+    <div id="inventoryPagination" class="inventory-pagination"></div>
+
+  </div>
+
+</div>

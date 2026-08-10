@@ -1,0 +1,230 @@
+<div id="dashboard-page" class="page">
+
+  <div class="page-header">
+
+    <div>
+      <h1>Dashboard</h1>
+      <p>Welcome to the Headset Inventory System</p>
+    </div>
+
+  </div>
+
+<div class="dashboard-stats">
+
+  <div class="stat-card">
+    <span class="material-icons-outlined">headset_mic</span>
+    <div>
+      <h3 id="statTotal">0</h3>
+      <p>Total Headsets</p>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <span class="material-icons-outlined">check_circle</span>
+    <div>
+      <h3 id="statAvailable">0</h3>
+      <p>Available</p>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <span class="material-icons-outlined">assignment_ind</span>
+    <div>
+      <h3 id="statIssued">0</h3>
+      <p>Issued</p>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <span class="material-icons-outlined">schedule</span>
+    <div>
+      <h3 id="statBorrowed">0</h3>
+      <p>Borrowed</p>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <span class="material-icons-outlined">warning</span>
+    <div>
+      <h3 id="statDamaged">0</h3>
+      <p>Damaged</p>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <span class="material-icons-outlined">build</span>
+    <div>
+      <h3 id="statRepair">0</h3>
+      <p>Under Repair</p>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <span class="material-icons-outlined">today</span>
+    <div>
+      <h3 id="statIssuedToday">0</h3>
+      <p>Issued Today</p>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <span class="material-icons-outlined">keyboard_return</span>
+    <div>
+      <h3 id="statReturnedToday">0</h3>
+      <p>Returned Today</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="dashboard-chart-card">
+
+  <div class="dashboard-chart-header">
+
+    <div>
+      <h2>Headset Inventory Status</h2>
+      <p>Current inventory distribution by status</p>
+    </div>
+
+  </div>
+
+  <div class="dashboard-chart-container">
+
+    <canvas id="inventoryStatusChart"></canvas>
+
+  </div>
+
+</div>
+
+<!-- =========================================
+     DASHBOARD QUICK ACTIONS
+     ========================================= -->
+
+<section class="dashboard-section">
+
+  <div class="section-header">
+    <div>
+      <h2>Quick Actions</h2>
+      <p>Frequently used headset management actions</p>
+    </div>
+  </div>
+
+<div class="quick-actions">
+
+  <button
+    type="button"
+    class="quick-action-btn"
+    onclick="openAddHeadsetModal()">
+
+    <span class="material-icons-outlined">
+      add_circle
+    </span>
+
+    <div>
+      <strong>Add Headset</strong>
+      <small>Add a new headset to inventory</small>
+    </div>
+
+  </button>
+
+
+  <button
+    type="button"
+    class="quick-action-btn"
+    onclick="openIssueHeadsetModal()">
+
+    <span class="material-icons-outlined">
+      assignment_ind
+    </span>
+
+    <div>
+      <strong>Issue Headset</strong>
+      <small>Assign a headset to an employee</small>
+    </div>
+
+  </button>
+
+  <button
+    type="button"
+    class="quick-action-btn"
+    onclick="openBorrowHeadsetModal()">
+
+    <span class="material-icons-outlined">
+      headphones
+    </span>
+
+    <div>
+      <strong>Borrow Headset</strong>
+      <small>Record a temporary headset loan</small>
+    </div>
+
+  </button>
+
+  <button
+    type="button"
+    class="quick-action-btn"
+    onclick="openReturnHeadsetModal()">
+
+    <span class="material-icons-outlined">
+      assignment_return
+    </span>
+
+    <div>
+      <strong>Return Headset</strong>
+      <small>Process a returned headset</small>
+    </div>
+
+  </button>
+
+</div>
+
+<!-- =========================================
+     RECENT TRANSACTIONS
+     ========================================= -->
+
+<section class="dashboard-section">
+
+  <div class="section-header">
+    <div>
+      <h2>Recent Transactions</h2>
+      <p>Latest headset activity</p>
+    </div>
+  </div>
+
+  <div class="recent-transactions-card">
+
+    <div class="transactions-table-wrapper">
+
+      <table class="transactions-table">
+
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Action</th>
+            <th>Asset ID</th>
+            <th>Brand</th>
+            <th>Employee</th>
+          </tr>
+        </thead>
+
+        <tbody id="recentTransactionsBody">
+
+          <tr>
+            <td colspan="5" class="transactions-loading">
+              Loading recent transactions...
+            </td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</section>
+
+</section>
+
+</div>

@@ -1,0 +1,334 @@
+<script>
+
+let inventoryCurrentPage = 1;
+const inventoryRowsPerPage = 10;
+
+
+/* =========================================
+   INVENTORY SEARCH
+   ========================================= */
+
+function searchInventory() {
+
+  const searchInput =
+    document.getElementById("inventorySearch");
+
+  const searchValue =
+    (searchInput?.value || "").toLowerCase().trim();
+
+  applyInventoryFilters(searchValue);
+
+}
+
+
+/* =========================================
+   INVENTORY STATUS FILTER
+   ========================================= */
+
+function filterInventory() {
+
+  const searchInput =
+    document.getElementById("inventorySearch");
+
+  const searchValue =
+    (searchInput?.value || "").toLowerCase().trim();
+
+  applyInventoryFilters(searchValue);
+
+}
+
+
+/* =========================================
+   APPLY SEARCH + FILTER
+   ========================================= */
+
+function applyInventoryFilters(searchValue) {
+
+  const statusFilter =
+    (
+      document.getElementById("inventoryStatusFilter")?.value || ""
+    ).toLowerCase().trim();
+
+  const rows =
+    document.querySelectorAll("#inventoryTable tbody tr");
+
+  rows.forEach(function(row) {
+
+    const cells = row.querySelectorAll("td");
+
+    if (cells.length < 7) {
+      return;
+    }
+
+    const assetId =
+      (cells[0].textContent || "").toLowerCase().trim();
+
+    const brand =
+      (cells[1].textContent || "").toLowerCase().trim();
+
+    const model =
+      (cells[2].textContent || "").toLowerCase().trim();
+
+    const serialNumber =
+      (cells[3].textContent || "").toLowerCase().trim();
+
+    const status =
+      (cells[4].textContent || "").toLowerCase().trim();
+
+    const assignedTo =
+      (cells[6].textContent || "").toLowerCase().trim();
+
+
+    /*
+     * SEARCH
+     *
+     * Search can now find:
+     * Asset ID
+     * Brand
+     * Model
+     * Serial Number
+     * Assigned To
+     */
+
+    const matchesSearch =
+      !searchValue ||
+      assetId.includes(searchValue) ||
+      brand.includes(searchValue) ||
+      model.includes(searchValue) ||
+      serialNumber.includes(searchValue) ||
+      assignedTo.includes(searchValue);
+
+
+    /*
+     * STATUS FILTER
+     */
+
+    const matchesStatus =
+      !statusFilter ||
+      status === statusFilter;
+
+
+    /*
+     * STORE RESULT
+     */
+
+    row.dataset.filterMatch =
+      matchesSearch && matchesStatus
+        ? "true"
+        : "false";
+
+  });
+
+
+  inventoryCurrentPage = 1;
+
+  paginateInventory();
+
+}
+
+
+/* =========================================
+   PAGINATION
+   ========================================= */
+
+function paginateInventory() {
+
+  const tbody =
+    document.querySelector("#inventoryTable tbody");
+
+  if (!tbody) {
+    return;
+  }
+
+  const rows =
+    Array.from(tbody.querySelectorAll("tr"));
+
+  const filteredRows =
+    rows.filter(function(row) {
+
+      return row.dataset.filterMatch !== "false";
+
+    });
+
+  const totalRows =
+    filteredRows.length;
+
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(totalRows / inventoryRowsPerPage)
+    );
+
+  if (inventoryCurrentPage > totalPages) {
+    inventoryCurrentPage = totalPages;
+  }
+
+  if (inventoryCurrentPage < 1) {
+    inventoryCurrentPage = 1;
+  }
+
+  rows.forEach(function(row) {
+
+    row.style.display = "none";
+
+  });
+
+  const startIndex =
+    (inventoryCurrentPage - 1) *
+    inventoryRowsPerPage;
+
+  const endIndex =
+    startIndex + inventoryRowsPerPage;
+
+  filteredRows
+    .slice(startIndex, endIndex)
+    .forEach(function(row) {
+
+      row.style.display = "";
+
+    });
+
+  updateInventoryPagination(
+    inventoryCurrentPage,
+    totalPages,
+    totalRows
+  );
+
+}
+
+
+/* =========================================
+   PAGINATION UI
+   ========================================= */
+
+function updateInventoryPagination(
+  currentPage,
+  totalPages,
+  totalRows
+) {
+
+  const pagination =
+    document.getElementById("inventoryPagination");
+
+  if (!pagination) {
+    return;
+  }
+
+  const start =
+    totalRows === 0
+      ? 0
+      : ((currentPage - 1) * inventoryRowsPerPage) + 1;
+
+  const end =
+    Math.min(
+      currentPage * inventoryRowsPerPage,
+      totalRows
+    );
+
+  pagination.innerHTML = `
+
+    <div class="pagination-info">
+
+      Showing ${start} - ${end}
+      of ${totalRows}
+
+    </div>
+
+    <div class="pagination-controls">
+
+      <button
+        type="button"
+        class="pagination-btn"
+        onclick="changeInventoryPage(-1)"
+        ${currentPage <= 1 ? "disabled" : ""}>
+
+        <span class="material-icons-outlined">
+          chevron_left
+        </span>
+
+        Previous
+
+      </button>
+
+      <span class="pagination-page">
+
+        Page ${currentPage} of ${totalPages}
+
+      </span>
+
+      <button
+        type="button"
+        class="pagination-btn"
+        onclick="changeInventoryPage(1)"
+        ${currentPage >= totalPages ? "disabled" : ""}>
+
+        Next
+
+        <span class="material-icons-outlined">
+          chevron_right
+        </span>
+
+      </button>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================================
+   CHANGE PAGE
+   ========================================= */
+
+function changeInventoryPage(direction) {
+
+  inventoryCurrentPage += direction;
+
+  paginateInventory();
+
+}
+
+
+/* =========================================
+   RESET PAGINATION
+   ========================================= */
+
+function resetInventoryPagination() {
+
+  inventoryCurrentPage = 1;
+
+  paginateInventory();
+
+}
+
+
+/* =========================================
+   INITIALIZE INVENTORY FILTER STATE
+   ========================================= */
+
+function initializeInventoryPagination() {
+
+  const tbody =
+    document.querySelector("#inventoryTable tbody");
+
+  if (!tbody) {
+    return;
+  }
+
+  const rows =
+    tbody.querySelectorAll("tr");
+
+  rows.forEach(function(row) {
+
+    row.dataset.filterMatch = "true";
+
+  });
+
+  inventoryCurrentPage = 1;
+
+  paginateInventory();
+
+}
+
+</script>

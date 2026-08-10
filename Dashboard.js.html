@@ -1,0 +1,258 @@
+<script>
+
+function loadDashboardStats() {
+
+  google.script.run
+    .withSuccessHandler(function(stats) {
+
+      stats = stats || {};
+
+      setDashboardValue("statTotal", stats.total);
+      setDashboardValue("statAvailable", stats.available);
+      setDashboardValue("statIssued", stats.issued);
+      setDashboardValue("statBorrowed", stats.borrowed);
+      setDashboardValue("statDamaged", stats.damaged);
+      setDashboardValue("statRepair", stats.repair);
+      setDashboardValue("statIssuedToday", stats.issuedToday);
+      setDashboardValue("statReturnedToday", stats.returnedToday);
+
+    })
+    .withFailureHandler(function(error) {
+
+      console.error("Dashboard statistics error:", error);
+
+      setDashboardValue("statTotal", 0);
+      setDashboardValue("statAvailable", 0);
+      setDashboardValue("statIssued", 0);
+      setDashboardValue("statBorrowed", 0);
+      setDashboardValue("statDamaged", 0);
+      setDashboardValue("statRepair", 0);
+      setDashboardValue("statIssuedToday", 0);
+      setDashboardValue("statReturnedToday", 0);
+
+    })
+    .getDashboardStats();
+
+}
+
+
+function setDashboardValue(elementId, value) {
+
+  const element = document.getElementById(elementId);
+
+  if (!element) {
+    console.warn("Dashboard element not found:", elementId);
+    return;
+  }
+
+  element.textContent = value ?? 0;
+
+}
+
+
+function refreshDashboard() {
+
+  loadDashboardStats();
+
+}
+
+<script>
+
+function loadRecentTransactions() {
+
+  const tbody = document.getElementById("recentTransactionsBody");
+
+  if (!tbody) return;
+
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="5" class="transactions-loading">
+        Loading recent transactions...
+      </td>
+    </tr>
+  `;
+
+  google.script.run
+    .withSuccessHandler(function(transactions) {
+
+      transactions = transactions || [];
+
+      if (transactions.length === 0) {
+
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="transactions-empty">
+              No recent transactions found.
+            </td>
+          </tr>
+        `;
+
+        return;
+      }
+
+      tbody.innerHTML = "";
+
+      transactions.forEach(function(transaction) {
+
+        let actionClass = "";
+
+        switch ((transaction.type || "").toLowerCase()) {
+
+          case "issued":
+            actionClass = "transaction-issued";
+            break;
+
+          case "borrowed":
+            actionClass = "transaction-borrowed";
+            break;
+
+          case "returned":
+            actionClass = "transaction-returned";
+            break;
+
+          default:
+            actionClass = "";
+        }
+
+        const date = transaction.date
+          ? new Date(transaction.date).toLocaleString()
+          : "-";
+
+        tbody.innerHTML += `
+          <tr>
+
+            <td>${date}</td>
+
+            <td>
+              <span class="transaction-badge ${actionClass}">
+                ${transaction.type || "-"}
+              </span>
+            </td>
+
+            <td>
+              <strong>${transaction.assetId || "-"}</strong>
+            </td>
+
+            <td>
+              ${transaction.brand || "-"}
+            </td>
+
+            <td>
+              ${transaction.agentName || "-"}
+            </td>
+
+          </tr>
+        `;
+
+      });
+
+    })
+    .withFailureHandler(function(error) {
+
+      console.error("Recent transactions error:", error);
+
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="transactions-error">
+            Unable to load recent transactions.
+          </td>
+        </tr>
+      `;
+
+    })
+    .getRecentTransactions();
+
+}
+
+
+<script>
+
+<script>
+
+/* =========================================
+   INVENTORY PAGINATION
+   ========================================= */
+
+let inventoryCurrentPage = 1;
+const inventoryRowsPerPage = 10;
+
+
+ {
+
+  let pagination =
+    document.getElementById("inventoryPagination");
+
+  if (!pagination) return;
+
+  pagination.innerHTML = `
+
+    <div class="pagination-info">
+
+      Showing
+      ${
+        totalRows === 0
+          ? 0
+          : ((currentPage - 1) * inventoryRowsPerPage) + 1
+      }
+
+      -
+
+      ${
+        Math.min(
+          currentPage * inventoryRowsPerPage,
+          totalRows
+        )
+      }
+
+      of ${totalRows}
+
+    </div>
+
+
+    <div class="pagination-controls">
+
+      <button
+        type="button"
+        class="pagination-btn"
+        onclick="changeInventoryPage(-1)"
+        ${currentPage <= 1 ? "disabled" : ""}>
+
+        <span class="material-icons-outlined">
+          chevron_left
+        </span>
+
+        Previous
+
+      </button>
+
+
+      <span class="pagination-page">
+
+        Page ${currentPage} of ${totalPages}
+
+      </span>
+
+
+      <button
+        type="button"
+        class="pagination-btn"
+        onclick="changeInventoryPage(1)"
+        ${currentPage >= totalPages ? "disabled" : ""}>
+
+        Next
+
+        <span class="material-icons-outlined">
+          chevron_right
+        </span>
+
+      </button>
+
+    </div>
+
+  `;
+
+}
+
+
+</script>
+

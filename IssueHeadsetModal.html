@@ -1,0 +1,93 @@
+<div id="issueHeadsetModal" class="modal" style="display:none;">
+
+  <div class="modal-content">
+
+    <div class="modal-header">
+
+      <h2>Issue Headset</h2>
+
+      <button class="modal-close" onclick="closeIssueHeadsetModal()">
+        <span class="material-icons-outlined">close</span>
+      </button>
+
+    </div>
+
+  <div class="modal-body">
+    
+    <div class="form-group">
+
+      <label>Date Issued</label>
+
+      <input
+        type="date"
+        id="issueDate"
+        readonly>
+
+    </div>
+
+    <div class="form-group">
+
+      <label>Agent Name</label>
+
+      <input
+        type="text"
+        id="issueAgentName"
+        placeholder="Enter Agent Name">
+
+    </div>
+
+    <div class="form-group">
+
+      <label>Asset ID</label>
+
+      <select id="issueAssetId">
+
+        <option value="">Select Asset ID</option>
+
+      </select>
+
+    </div>
+
+    <div class="form-group">
+
+      <label>Headset Brand</label>
+
+      <input
+        type="text"
+        id="issueHeadsetBrand"
+        readonly
+        placeholder="Automatically filled">
+
+    </div>
+
+    <div class="form-group">
+
+      <label>Issued By</label>
+
+      <input
+        type="text"
+        id="issuedBy"
+        placeholder="Enter your name"
+        autocomplete="off">
+        
+    </div>
+
+    <div class="modal-footer">
+
+      <button class="btn-secondary" onclick="closeIssueHeadsetModal()">
+        Cancel
+      </button>
+
+      <button
+        class="btn-primary"
+        id="btnIssueHeadset"
+        onclick="issueHeadset()">
+        Issue Headset
+      </button>
+
+    </div>
+  </div>
+
+  </div>
+
+</div>

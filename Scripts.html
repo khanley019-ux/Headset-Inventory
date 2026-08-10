@@ -1,0 +1,1682 @@
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+function login() {
+
+  document.getElementById("login-container").style.display = "none";
+  document.getElementById("app-layout").style.display = "flex";
+
+  loadDashboardStats();
+
+}
+
+function loadDashboardStats() {
+
+  console.log("Loading dashboard statistics...");
+
+  google.script.run
+
+    .withSuccessHandler(function(stats) {
+
+      console.log("Dashboard stats received:", stats);
+
+      if (!stats) {
+        console.error("No dashboard statistics received.");
+        return;
+      }
+
+
+      // ==========================================
+      // TOTAL
+      // ==========================================
+
+      const total =
+        document.getElementById("statTotal");
+
+      if (total) {
+        total.textContent = stats.total || 0;
+      }
+
+
+      // ==========================================
+      // AVAILABLE
+      // ==========================================
+
+      const available =
+        document.getElementById("statAvailable");
+
+      if (available) {
+        available.textContent =
+          stats.available || 0;
+      }
+
+
+      // ==========================================
+      // ISSUED / ASSIGNED
+      // ==========================================
+
+      const issued =
+        document.getElementById("statIssued");
+
+      if (issued) {
+        issued.textContent =
+          stats.issued || 0;
+      }
+
+
+      // ==========================================
+      // BORROWED
+      // ==========================================
+
+      const borrowed =
+        document.getElementById("statBorrowed");
+
+      if (borrowed) {
+        borrowed.textContent =
+          stats.borrowed || 0;
+      }
+
+
+      // ==========================================
+      // DAMAGED
+      // ==========================================
+
+      const damaged =
+        document.getElementById("statDamaged");
+
+      if (damaged) {
+        damaged.textContent =
+          stats.damaged || 0;
+      }
+
+
+      // ==========================================
+      // UNDER REPAIR
+      // ==========================================
+
+      const repair =
+        document.getElementById("statRepair");
+
+      if (repair) {
+        repair.textContent =
+          stats.repair || 0;
+      }
+
+
+      // ==========================================
+      // ISSUED TODAY
+      // ==========================================
+
+      const issuedToday =
+        document.getElementById("statIssuedToday");
+
+      if (issuedToday) {
+        issuedToday.textContent =
+          stats.issuedToday || 0;
+      }
+
+
+      // ==========================================
+      // RETURNED TODAY
+      // ==========================================
+
+      const returnedToday =
+        document.getElementById("statReturnedToday");
+
+      if (returnedToday) {
+        returnedToday.textContent =
+          stats.returnedToday || 0;
+      }
+
+
+      console.log(
+        "Dashboard statistics updated successfully."
+      );
+
+      loadInventoryStatusChart(stats);
+
+    })
+
+    .withFailureHandler(function(error) {
+
+      console.error(
+        "Dashboard statistics error:",
+        error
+      );
+
+      alert(
+        "Failed to load dashboard statistics: " +
+        (error.message || error)
+      );
+
+    })
+
+    .getDashboardStats();
+
+}
+
+function loadInventoryStatusChart(stats) {
+
+  const canvas =
+    document.getElementById(
+      "inventoryStatusChart"
+    );
+
+  if (!canvas) {
+
+    console.error(
+      "inventoryStatusChart canvas not found."
+    );
+
+    return;
+
+  }
+
+
+  // ==========================================
+  // DESTROY EXISTING CHART
+  // ==========================================
+
+  if (
+    window.inventoryStatusChart &&
+    typeof window.inventoryStatusChart.destroy === "function"
+  ) {
+
+    window.inventoryStatusChart.destroy();
+
+  }
+
+
+  // ==========================================
+  // CREATE CHART
+  // ==========================================
+
+  const ctx =
+    canvas.getContext("2d");
+
+
+  window.inventoryStatusChart =
+    new Chart(ctx, {
+
+      type: "bar",
+
+      data: {
+
+        labels: [
+          "Available",
+          "Assigned",
+          "Borrowed",
+          "Damaged",
+          "Under Repair",
+          "Lost"
+        ],
+
+        datasets: [
+
+          {
+
+            label: "Headsets",
+
+            data: [
+
+              Number(stats.available || 0),
+
+              Number(stats.issued || 0),
+
+              Number(stats.borrowed || 0),
+
+              Number(stats.damaged || 0),
+
+              Number(stats.repair || 0),
+
+              Number(stats.lost || 0)
+
+            ],
+
+            borderWidth: 1,
+
+            borderRadius: 6
+
+          }
+
+        ]
+
+      },
+
+
+      options: {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        plugins: {
+
+          legend: {
+
+            display: false
+
+          }
+
+        },
+
+        scales: {
+
+          y: {
+
+            beginAtZero: true,
+
+            ticks: {
+
+              precision: 0
+
+            }
+
+          }
+
+        }
+
+      }
+
+    });
+
+}
+
+function loadRecentTransactions() {
+
+  console.log(
+    "Loading recent transactions..."
+  );
+
+
+  const tbody =
+    document.getElementById(
+      "recentTransactionsBody"
+    );
+
+
+  if (!tbody) {
+
+    console.error(
+      "recentTransactionsBody not found."
+    );
+
+    return;
+
+  }
+
+
+  // Show loading state
+
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="5" class="transactions-loading">
+        Loading recent transactions...
+      </td>
+    </tr>
+  `;
+
+
+  google.script.run
+
+    .withSuccessHandler(function(transactions) {
+
+      console.log(
+        "Recent transactions received:",
+        transactions
+      );
+
+
+      tbody.innerHTML = "";
+
+
+      // No transactions
+
+      if (
+        !transactions ||
+        transactions.length === 0
+      ) {
+
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="transactions-empty">
+              No recent transactions found.
+            </td>
+          </tr>
+        `;
+
+        return;
+
+      }
+
+
+      transactions.forEach(function(transaction) {
+
+
+        // =====================================
+        // FORMAT DATE
+        // =====================================
+
+        let formattedDate = "-";
+
+
+        if (transaction.date) {
+
+          const date =
+            new Date(transaction.date);
+
+
+          if (!isNaN(date.getTime())) {
+
+            formattedDate =
+              date.toLocaleDateString(
+                "en-US",
+                {
+                  month: "2-digit",
+                  day: "2-digit",
+                  year: "numeric"
+                }
+              );
+
+          }
+
+        }
+
+
+        // =====================================
+        // ACTION CLASS
+        // =====================================
+
+        let actionClass =
+          "transaction-action";
+
+
+        const action =
+          (
+            transaction.action || ""
+          ).toLowerCase();
+
+
+        if (action === "issued") {
+
+          actionClass +=
+            " transaction-issued";
+
+        }
+        else if (action === "borrowed") {
+
+          actionClass +=
+            " transaction-borrowed";
+
+        }
+        else if (action === "returned") {
+
+          actionClass +=
+            " transaction-returned";
+
+        }
+
+
+        // =====================================
+        // ADD ROW
+        // =====================================
+
+        tbody.innerHTML += `
+
+          <tr>
+
+            <td>
+              ${formattedDate}
+            </td>
+
+
+            <td>
+
+              <span class="${actionClass}">
+                ${transaction.action || "-"}
+              </span>
+
+            </td>
+
+
+            <td>
+              ${transaction.assetId || "-"}
+            </td>
+
+
+            <td>
+              ${transaction.brand || "-"}
+            </td>
+
+
+            <td>
+              ${transaction.employee || "-"}
+            </td>
+
+          </tr>
+
+        `;
+
+      });
+
+    })
+
+
+    .withFailureHandler(function(error) {
+
+      console.error(
+        "Recent transactions error:",
+        error
+      );
+
+
+      tbody.innerHTML = `
+
+        <tr>
+
+          <td
+            colspan="5"
+            class="transactions-empty"
+          >
+
+            Unable to load recent transactions.
+
+          </td>
+
+        </tr>
+
+      `;
+
+    })
+
+
+    .getRecentTransactions();
+
+}
+
+function loadInventory() {
+
+  document.getElementById("dashboard-page").style.display = "none";
+  document.getElementById("inventory-page").style.display = "block";
+
+  document.getElementById("menuDashboard").classList.remove("active");
+  document.getElementById("menuInventory").classList.add("active");
+
+  loadInventoryData();
+
+}
+
+function loadDashboard() {
+
+  document.getElementById("inventory-page").style.display = "none";
+  document.getElementById("dashboard-page").style.display = "block";
+
+  document.getElementById("menuInventory").classList.remove("active");
+  document.getElementById("menuDashboard").classList.add("active");
+
+  loadDashboardStats();
+  loadRecentTransactions();
+
+}
+
+function loadInventoryData() {
+
+  google.script.run
+    .withSuccessHandler(function(data) {
+
+      const tbody = document.querySelector("#inventoryTable tbody");
+
+      tbody.innerHTML = "";
+
+      data.forEach(function(item) {
+
+        let statusClass = "";
+
+        switch ((item.status || "").toLowerCase()) {
+          case "available":
+            statusClass = "available";
+            break;
+          case "issued":
+            statusClass = "issued";
+            break;
+          case "borrowed":
+            statusClass = "borrowed";
+            break;
+          case "damaged":
+            statusClass = "damaged";
+            break;
+          default:
+            statusClass = "default";
+        }
+
+        tbody.innerHTML += `
+          <tr>
+            <td>${item.assetId}</td>
+            <td>${item.brand}</td>
+            <td>${item.model}</td>
+            <td>${item.serialNumber}</td>
+
+            <td>
+              <span class="status-badge ${statusClass}">
+                ${item.status || "-"}
+              </span>
+            </td>
+
+            <td>${item.condition || "-"}</td>
+            <td>${item.assignedTo || "-"}</td>
+
+            <td style="text-align:center;">
+              <button
+                  class="btn-icon"
+                  onclick="viewHeadset(this)"
+                  data-assetid="${item.assetId}"
+                  title="View Details">
+                  <span class="material-icons-outlined">visibility</span>
+              </button>
+            </td>
+
+          </tr>
+        `;
+
+      });
+
+      initializeInventoryPagination();
+
+    })
+    .withFailureHandler(function(error) {
+
+      console.error(error);
+      alert(error.message);
+
+    })
+    .getInventory();
+
+}
+
+function searchInventory() {
+
+  const keyword = document
+    .getElementById("inventorySearch")
+    .value
+    .toLowerCase();
+
+  const rows = document.querySelectorAll("#inventoryTable tbody tr");
+
+  rows.forEach(row => {
+
+    const text = row.textContent.toLowerCase();
+
+    row.style.display = text.includes(keyword) ? "" : "none";
+
+  });
+
+}
+
+function openAddHeadsetModal() {
+
+  document.getElementById("addHeadsetModal").style.display = "flex";
+
+  google.script.run
+    .withSuccessHandler(function(assetId) {
+
+      document.getElementById("assetId").value = assetId;
+
+    })
+    .withFailureHandler(function(error) {
+
+      console.error(error);
+      alert("Unable to generate the next Asset ID.");
+
+    })
+    .getNextAssetId();
+
+}
+
+function closeAddHeadsetModal() {
+
+  document.getElementById("addHeadsetModal").style.display = "none";
+
+}
+
+function saveHeadset() {
+
+  const btn = document.getElementById("btnSaveHeadset");
+
+  btn.disabled = true;
+  btn.textContent = "Saving...";
+
+  const headset = {
+
+    assetId: document.getElementById("assetId").value,
+    brand: document.getElementById("brand").value.trim(),
+    model: document.getElementById("model").value.trim(),
+    serialNumber: document.getElementById("serialNumber").value.trim(),
+    condition: document.getElementById("condition").value,
+    purchaseDate: document.getElementById("purchaseDate").value,
+    purchasePrice: document.getElementById("purchasePrice").value
+
+  };
+
+  if (!headset.brand) {
+    alert("Please enter the Brand.");
+    btn.disabled = false;
+    btn.textContent = "Save Headset";
+    return;
+  }
+
+  if (!headset.model) {
+    alert("Please enter the Model.");
+    btn.disabled = false;
+    btn.textContent = "Save Headset";
+    return;
+  }
+
+  if (!headset.serialNumber) {
+    alert("Please enter the Serial Number.");
+    btn.disabled = false;
+    btn.textContent = "Save Headset";
+    return;
+  }
+
+  google.script.run
+    .withSuccessHandler(function() {
+
+      document.getElementById("brand").value = "";
+      document.getElementById("model").value = "";
+      document.getElementById("serialNumber").value = "";
+      document.getElementById("purchaseDate").value = "";
+      document.getElementById("purchasePrice").value = "";
+
+      closeAddHeadsetModal();
+
+      loadInventoryData();
+      loadDashboardStats();
+
+      btn.disabled = false;
+      btn.textContent = "Save Headset";
+
+      alert("Headset added successfully!");
+
+    })
+    .withFailureHandler(function(error) {
+
+      btn.disabled = false;
+      btn.textContent = "Save Headset";
+
+      console.error(error);
+      alert("Error: " + error.message);
+
+    })
+    .saveHeadset(headset);
+
+}
+
+function openIssueHeadsetModal() {
+
+  document.getElementById("issueHeadsetModal").style.display = "flex";
+
+  document.getElementById("issueDate").value =
+  new Date().toISOString().split("T")[0];
+
+  const select = document.getElementById("issueAssetId");
+  const brandInput = document.getElementById("issueHeadsetBrand");
+
+  google.script.run
+    .withSuccessHandler(function(headsets) {
+
+      select.innerHTML = '<option value="">Select Asset ID</option>';
+
+      headsets.forEach(function(headset) {
+
+        const option = document.createElement("option");
+
+        option.value = headset.assetId;
+        option.textContent = headset.assetId + " - " + headset.brand;
+        option.dataset.brand = headset.brand;
+
+        select.appendChild(option);
+
+      });
+
+      select.onchange = function() {
+
+        const selected = select.options[select.selectedIndex];
+
+        brandInput.value = selected.dataset.brand || "";
+
+      };
+
+    })
+    .withFailureHandler(function(error) {
+
+      console.error(error);
+
+      alert("Error loading available headsets.");
+
+    })
+    .getAvailableHeadsets();
+
+}
+
+function closeIssueHeadsetModal() {
+
+  document.getElementById("issueHeadsetModal").style.display = "none";
+
+}
+
+function issueHeadset() {
+
+  const btn = document.getElementById("btnIssueHeadset");
+
+  btn.disabled = true;
+  btn.textContent = "Issuing...";
+
+  const issue = {
+
+    agentName: document.getElementById("issueAgentName").value.trim(),
+    assetId: document.getElementById("issueAssetId").value,
+    issuedBy: document.getElementById("issuedBy").value.trim()
+
+  };
+
+  if (!issue.agentName) {
+    alert("Please enter the Agent Name.");
+    btn.disabled = false;
+    btn.textContent = "Issue Headset";
+    return;
+  }
+
+  if (!issue.assetId) {
+    alert("Please select an Asset ID.");
+    btn.disabled = false;
+    btn.textContent = "Issue Headset";
+    return;
+  }
+
+  if (!issue.issuedBy) {
+    alert("Please enter who issued the headset.");
+    btn.disabled = false;
+    btn.textContent = "Issue Headset";
+    return;
+  }
+
+  google.script.run
+    .withSuccessHandler(function() {
+
+      document.getElementById("issueAgentName").value = "";
+      document.getElementById("issueAssetId").selectedIndex = 0;
+      document.getElementById("issuedBy").value = "";
+
+      closeIssueHeadsetModal();
+
+      loadInventoryData();
+      loadDashboardStats();
+
+      btn.disabled = false;
+      btn.textContent = "Issue Headset";
+
+      alert("Headset issued successfully!");
+
+    })
+    .withFailureHandler(function(error) {
+
+      btn.disabled = false;
+      btn.textContent = "Issue Headset";
+
+      console.error(error);
+      alert("Error: " + error.message);
+
+    })
+    .issueHeadset(issue);
+
+}
+
+function viewHeadset(button) {
+
+  const assetId = button.dataset.assetid.trim();
+
+  console.log("Asset ID:", assetId);
+
+  google.script.run
+    .withSuccessHandler(function(headset) {
+
+      if (!headset) {
+        alert("Headset not found: " + assetId);
+        return;
+      }
+
+      document.getElementById("detailAssetId").textContent = headset.assetId || "-";
+      document.getElementById("detailBrand").textContent = headset.brand || "-";
+      document.getElementById("detailModel").textContent = headset.model || "-";
+      document.getElementById("detailSerial").textContent = headset.serialNumber || "-";
+      document.getElementById("detailStatus").textContent = headset.status || "-";
+      document.getElementById("detailCondition").textContent = headset.condition || "-";
+      document.getElementById("detailAssigned").textContent = headset.assignedTo || "-";
+      document.getElementById("detailLastUser").textContent = headset.lastUser || "-";
+      document.getElementById("detailDateIssued").textContent = headset.dateIssued || "-";
+      document.getElementById("detailDateReturned").textContent = headset.dateReturned || "-";
+      document.getElementById("detailPurchaseDate").textContent = headset.purchaseDate || "-";
+      document.getElementById("detailPurchasePrice").textContent = headset.purchasePrice || "-";
+      document.getElementById("detailAge").textContent = headset.ageMonths || "-";
+      document.getElementById("detailDepreciated").textContent = headset.depreciatedValue || "-";
+
+      document.getElementById("headsetDetailsModal").style.display = "flex";
+
+    })
+    .withFailureHandler(function(error) {
+      alert(error.message);
+    })
+    .getHeadsetByAssetId(assetId);
+
+}
+
+
+function closeHeadsetDetails() {
+
+  document.getElementById("headsetDetailsModal").style.display = "none";
+
+}
+
+function openBorrowHeadsetModal() {
+
+  const modal =
+    document.getElementById("borrowHeadsetModal");
+
+  if (!modal) {
+    console.error("Borrow Headset modal not found.");
+    return;
+  }
+
+  modal.style.display = "flex";
+
+
+  // Clear previous values
+
+  document.getElementById("borrowAgentName").value = "";
+  document.getElementById("borrowHeadsetBrand").value = "";
+  document.getElementById("borrowIssuedBy").value = "";
+
+
+  const select =
+    document.getElementById("borrowAssetId");
+
+
+  select.innerHTML =
+    '<option value="">Loading available headsets...</option>';
+
+
+  google.script.run
+
+    .withSuccessHandler(function(headsets) {
+
+      select.innerHTML =
+        '<option value="">Select Asset ID</option>';
+
+
+      if (!headsets || headsets.length === 0) {
+
+        select.innerHTML =
+          '<option value="">No available headsets</option>';
+
+        return;
+
+      }
+
+
+      headsets.forEach(function(headset) {
+
+        const option =
+          document.createElement("option");
+
+        option.value =
+          headset.assetId;
+
+        option.textContent =
+          headset.assetId + " - " + headset.brand;
+
+        option.dataset.brand =
+          headset.brand || "";
+
+        select.appendChild(option);
+
+      });
+
+
+      select.onchange = function() {
+
+        const selected =
+          select.options[select.selectedIndex];
+
+
+        document.getElementById(
+          "borrowHeadsetBrand"
+        ).value =
+          selected.dataset.brand || "";
+
+      };
+
+    })
+
+    .withFailureHandler(function(error) {
+
+      console.error(
+        "Error loading borrowable headsets:",
+        error
+      );
+
+      select.innerHTML =
+        '<option value="">Unable to load headsets</option>';
+
+      alert(
+        "Unable to load available headsets."
+      );
+
+    })
+
+    .getBorrowableHeadsets();
+
+}
+
+
+function closeBorrowHeadsetModal() {
+
+  const modal =
+    document.getElementById("borrowHeadsetModal");
+
+  if (modal) {
+    modal.style.display = "none";
+  }
+
+}
+
+
+function saveBorrowHeadset() {
+
+  const agentName =
+    document.getElementById(
+      "borrowAgentName"
+    ).value.trim();
+
+
+  const assetId =
+    document.getElementById(
+      "borrowAssetId"
+    ).value;
+
+
+  const brand =
+    document.getElementById(
+      "borrowHeadsetBrand"
+    ).value;
+
+
+  const issuedBy =
+    document.getElementById(
+      "borrowIssuedBy"
+    ).value.trim();
+
+
+  // Validation
+
+  if (!agentName) {
+
+    alert("Please enter the Agent Name.");
+
+    return;
+
+  }
+
+
+  if (!assetId) {
+
+    alert("Please select an Asset ID.");
+
+    return;
+
+  }
+
+
+  if (!issuedBy) {
+
+    alert("Please enter the IT staff name.");
+
+    return;
+
+  }
+
+
+  const button =
+    document.getElementById(
+      "btnSaveBorrowHeadset"
+    );
+
+
+  button.disabled = true;
+
+  button.innerHTML = `
+    <span class="material-icons-outlined">
+      hourglass_top
+    </span>
+    Saving...
+  `;
+
+
+  const data = {
+
+    agentName: agentName,
+    assetId: assetId,
+    brand: brand,
+    issuedBy: issuedBy
+
+  };
+
+
+  google.script.run
+
+    .withSuccessHandler(function(result) {
+
+      button.disabled = false;
+
+      button.innerHTML = `
+        <span class="material-icons-outlined">
+          save
+        </span>
+        Save Borrow
+      `;
+
+
+      if (!result || !result.success) {
+
+        alert(
+          "Borrow transaction could not be saved."
+        );
+
+        return;
+
+      }
+
+
+      alert(
+        "Headset borrowed successfully."
+      );
+
+
+      closeBorrowHeadsetModal();
+
+
+      // Refresh Inventory
+
+      if (typeof loadInventoryData === "function") {
+        loadInventoryData();
+      }
+
+
+      // Refresh Dashboard statistics
+
+      if (typeof loadDashboardStats === "function") {
+        loadDashboardStats();
+      }
+
+
+      // Refresh Recent Transactions
+
+      if (
+        typeof loadRecentTransactions === "function"
+      ) {
+
+        loadRecentTransactions();
+
+      }
+
+    })
+
+    .withFailureHandler(function(error) {
+
+      console.error(
+        "Borrow headset error:",
+        error
+      );
+
+
+      button.disabled = false;
+
+      button.innerHTML = `
+        <span class="material-icons-outlined">
+          save
+        </span>
+        Save Borrow
+      `;
+
+
+      alert(
+        error.message ||
+        "Unable to save borrow transaction."
+      );
+
+    })
+
+    .borrowHeadset(data);
+
+}
+
+function openReturnHeadsetModal() {
+
+  const modal =
+    document.getElementById("returnHeadsetModal");
+
+  if (!modal) {
+    console.error("Return Headset modal not found.");
+    return;
+  }
+
+  modal.style.display = "flex";
+
+
+  // Today's date
+
+  const today =
+    new Date().toISOString().split("T")[0];
+
+  document.getElementById("returnDate").value =
+    today;
+
+
+  // Clear previous values
+
+  document.getElementById("returnAssetId").value = "";
+
+  document.getElementById("returnAgentName").value = "";
+
+  document.getElementById("returnHeadsetBrand").value = "";
+
+  document.getElementById("returnCurrentStatus").value = "";
+
+  document.getElementById("returnStatus").value = "";
+
+  document.getElementById("returnCheckedBy").value = "";
+
+  document.getElementById("returnRemarks").value = "";
+
+
+  // Put cursor directly into Asset ID
+
+  setTimeout(function() {
+
+    document.getElementById(
+      "returnAssetId"
+    ).focus();
+
+  }, 100);
+
+}
+
+
+/**
+ * Search a headset by Asset ID.
+ *
+ * Allowed current statuses:
+ *
+ * Assigned
+ * Borrowed
+ */
+function searchReturnAsset() {
+
+  const assetInput =
+    document.getElementById(
+      "returnAssetId"
+    );
+
+
+  const assetId =
+    assetInput.value.trim();
+
+
+  if (!assetId) {
+
+    alert(
+      "Please enter an Asset ID."
+    );
+
+    assetInput.focus();
+
+    return;
+
+  }
+
+
+  // Clear old information
+
+  document.getElementById(
+    "returnAgentName"
+  ).value = "";
+
+
+  document.getElementById(
+    "returnHeadsetBrand"
+  ).value = "";
+
+
+  document.getElementById(
+    "returnCurrentStatus"
+  ).value = "";
+
+
+  google.script.run
+
+    .withSuccessHandler(function(result) {
+
+      if (!result) {
+
+        alert(
+          "No headset was found."
+        );
+
+        return;
+
+      }
+
+
+      if (!result.found) {
+
+        alert(
+          result.message ||
+          "This headset cannot be returned."
+        );
+
+        return;
+
+      }
+
+
+      /*
+       * Fill headset information
+       */
+
+      document.getElementById(
+        "returnAssetId"
+      ).value =
+        result.assetId || assetId;
+
+
+      document.getElementById(
+        "returnAgentName"
+      ).value =
+        result.agentName || "";
+
+
+      document.getElementById(
+        "returnHeadsetBrand"
+      ).value =
+        result.brand || "";
+
+
+      document.getElementById(
+        "returnCurrentStatus"
+      ).value =
+        result.status || "";
+
+
+    })
+
+    .withFailureHandler(function(error) {
+
+      console.error(
+        "Return asset search error:",
+        error
+      );
+
+
+      alert(
+        error.message ||
+        "Unable to search for the headset."
+      );
+
+    })
+
+    .searchReturnableHeadset(assetId);
+
+}
+
+
+/**
+ * Allow pressing Enter while searching
+ * the Asset ID.
+ */
+document.addEventListener(
+  "keydown",
+  function(event) {
+
+    const input =
+      document.getElementById(
+        "returnAssetId"
+      );
+
+
+    if (
+      input &&
+      document.activeElement === input &&
+      event.key === "Enter"
+    ) {
+
+      event.preventDefault();
+
+      searchReturnAsset();
+
+    }
+
+  }
+);
+
+
+/**
+ * Close Return Headset modal.
+ */
+function closeReturnHeadsetModal() {
+
+  const modal =
+    document.getElementById(
+      "returnHeadsetModal"
+    );
+
+
+  if (modal) {
+
+    modal.style.display = "none";
+
+  }
+
+}
+
+
+/**
+ * Save Return transaction.
+ */
+function saveReturnHeadset() {
+
+  const assetId =
+    document.getElementById(
+      "returnAssetId"
+    ).value.trim();
+
+
+  const agentName =
+    document.getElementById(
+      "returnAgentName"
+    ).value.trim();
+
+
+  const brand =
+    document.getElementById(
+      "returnHeadsetBrand"
+    ).value.trim();
+
+
+  const currentStatus =
+    document.getElementById(
+      "returnCurrentStatus"
+    ).value.trim();
+
+
+  const statusUponReturn =
+    document.getElementById(
+      "returnStatus"
+    ).value;
+
+
+  const checkedBy =
+    document.getElementById(
+      "returnCheckedBy"
+    ).value.trim();
+
+
+  const remarks =
+    document.getElementById(
+      "returnRemarks"
+    ).value.trim();
+
+
+  /*
+   * =========================================
+   * VALIDATION
+   * =========================================
+   */
+
+
+  if (!assetId) {
+
+    alert(
+      "Please enter an Asset ID."
+    );
+
+    return;
+
+  }
+
+
+  if (!agentName) {
+
+    alert(
+      "Please search the Asset ID first."
+    );
+
+    return;
+
+  }
+
+
+  if (!brand) {
+
+    alert(
+      "Please search the Asset ID first."
+    );
+
+    return;
+
+  }
+
+
+  if (!currentStatus) {
+
+    alert(
+      "Please search the Asset ID first."
+    );
+
+    return;
+
+  }
+
+
+  if (
+    currentStatus.toLowerCase() !== "assigned" &&
+    currentStatus.toLowerCase() !== "borrowed"
+  ) {
+
+    alert(
+      "Only Assigned or Borrowed headsets can be returned."
+    );
+
+    return;
+
+  }
+
+
+  if (!statusUponReturn) {
+
+    alert(
+      "Please select the Status Upon Return."
+    );
+
+    return;
+
+  }
+
+
+  if (!checkedBy) {
+
+    alert(
+      "Please enter Checked By."
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * =========================================
+   * SAVE BUTTON
+   * =========================================
+   */
+
+  const button =
+    document.getElementById(
+      "btnReturnHeadset"
+    );
+
+
+  button.disabled = true;
+
+
+  button.innerHTML = `
+    <span class="material-icons-outlined">
+      hourglass_top
+    </span>
+    Saving...
+  `;
+
+
+  const data = {
+
+    assetId:
+      assetId,
+
+    statusUponReturn:
+      statusUponReturn,
+
+    checkedBy:
+      checkedBy,
+
+    remarks:
+      remarks
+
+  };
+
+
+  /*
+   * =========================================
+   * SEND TO APPS SCRIPT
+   * =========================================
+   */
+
+  google.script.run
+
+    .withSuccessHandler(function(result) {
+
+      button.disabled = false;
+
+
+      button.innerHTML = `
+        Return Headset
+      `;
+
+
+      if (
+        !result ||
+        !result.success
+      ) {
+
+        alert(
+          "Return transaction could not be saved."
+        );
+
+        return;
+
+      }
+
+
+      /*
+       * Success
+       */
+
+      alert(
+        "Headset returned successfully."
+      );
+
+
+      closeReturnHeadsetModal();
+
+
+      /*
+       * Refresh Inventory
+       */
+
+      if (
+        typeof loadInventoryData ===
+        "function"
+      ) {
+
+        loadInventoryData();
+
+      }
+
+
+      /*
+       * Refresh Dashboard
+       */
+
+      if (
+        typeof loadDashboardStats ===
+        "function"
+      ) {
+
+        loadDashboardStats();
+
+      }
+
+
+      /*
+       * Refresh Recent Transactions
+       */
+
+      if (
+        typeof loadRecentTransactions ===
+        "function"
+      ) {
+
+        loadRecentTransactions();
+
+      }
+
+    })
+
+
+    .withFailureHandler(function(error) {
+
+      console.error(
+        "Return headset error:",
+        error
+      );
+
+
+      button.disabled = false;
+
+
+      button.innerHTML = `
+        Return Headset
+      `;
+
+
+      alert(
+        error.message ||
+        "Unable to save return transaction."
+      );
+
+    })
+
+
+    .returnHeadset(data);
+
+}
+
+</script>
