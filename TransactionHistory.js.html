@@ -1,5 +1,16 @@
 <script>
 
+let transactionHistoryData = [];
+
+let transactionCurrentPage = 1;
+
+const transactionRowsPerPage = 10;
+
+
+/* =========================================
+   LOAD TRANSACTION HISTORY PAGE
+   ========================================= */
+
 function loadTransactionHistory() {
 
   const dashboardPage =
@@ -26,19 +37,12 @@ function loadTransactionHistory() {
   }
 
 
-  // Hide pages
-
   dashboardPage.style.display = "none";
 
   inventoryPage.style.display = "none";
 
-
-  // Show Transaction History
-
   transactionPage.style.display = "block";
 
-
-  // Sidebar active state
 
   document
     .getElementById("menuDashboard")
@@ -57,11 +61,14 @@ function loadTransactionHistory() {
     ?.classList.remove("active");
 
 
-  // Load transaction data
-
   loadTransactionHistoryData();
 
 }
+
+
+/* =========================================
+   LOAD DATA
+   ========================================= */
 
 function loadTransactionHistoryData() {
 
@@ -78,26 +85,15 @@ function loadTransactionHistoryData() {
     );
 
     return;
-
   }
 
 
-  // Loading state
-
   tbody.innerHTML = `
-
     <tr>
-
-      <td
-        colspan="5"
-        class="transactions-loading">
-
+      <td colspan="5" class="transactions-loading">
         Loading transaction history...
-
       </td>
-
     </tr>
-
   `;
 
 
@@ -105,212 +101,509 @@ function loadTransactionHistoryData() {
 
     .withSuccessHandler(function(transactions) {
 
-      console.log("TRANSACTION DATA RECEIVED:", transactions);
-      console.log("TRANSACTION COUNT:", transactions ? transactions.length : "NULL"); 
-
       console.log(
-        "Transaction History received:",
+        "Transaction history received:",
         transactions
       );
 
 
-      transactions =
+      transactionHistoryData =
         transactions || [];
 
 
-      if (transactions.length === 0) {
+      transactionCurrentPage = 1;
 
-        tbody.innerHTML = `
 
-          <tr>
-
-            <td
-              colspan="5"
-              class="transactions-empty">
-
-              No transaction history found.
-
-            </td>
-
-          </tr>
-
-        `;
-
-        return;
-
-      }
-
-
-      tbody.innerHTML = "";
-
-
-      transactions.forEach(
-        function(transaction) {
-
-
-          // =====================================
-          // DATE
-          // =====================================
-
-          let formattedDate = "-";
-
-
-          if (transaction.date) {
-
-            const date =
-              new Date(
-                transaction.date
-              );
-
-
-            if (!isNaN(date.getTime())) {
-
-              formattedDate =
-                date.toLocaleDateString(
-                  "en-US",
-                  {
-                    month: "2-digit",
-                    day: "2-digit",
-                    year: "numeric"
-                  }
-                );
-
-            }
-
-          }
-
-
-          // =====================================
-          // ACTION CLASS
-          // =====================================
-
-          let actionClass =
-            "transaction-action";
-
-
-          const action =
-            (
-              transaction.action || ""
-            )
-            .toLowerCase()
-            .trim();
-
-
-          if (action === "issued") {
-
-            actionClass +=
-              " transaction-issued";
-
-          }
-
-          else if (
-            action === "borrowed"
-          ) {
-
-            actionClass +=
-              " transaction-borrowed";
-
-          }
-
-          else if (
-            action === "returned"
-          ) {
-
-            actionClass +=
-              " transaction-returned";
-
-          }
-
-
-          // =====================================
-          // TABLE ROW
-          // =====================================
-
-          tbody.innerHTML += `
-
-            <tr>
-
-              <td>
-                ${formattedDate}
-              </td>
-
-
-              <td>
-
-                <span
-                  class="${actionClass}">
-
-                  ${transaction.action || "-"}
-
-                </span>
-
-              </td>
-
-
-              <td>
-
-                <strong>
-                  ${transaction.assetId || "-"}
-                </strong>
-
-              </td>
-
-
-              <td>
-                ${transaction.brand || "-"}
-              </td>
-
-
-              <td>
-                ${transaction.employee || "-"}
-              </td>
-
-            </tr>
-
-          `;
-
-
-        }
-      );
-
-
-      console.log(
-        "Transaction History rendered:",
-        transactions.length
-      );
+      renderTransactionHistory();
 
 
     })
 
-
     .withFailureHandler(function(error) {
 
       console.error(
-        "Transaction History error:",
+        "Transaction history error:",
         error
       );
 
 
+      transactionHistoryData = [];
+
+
       tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="transactions-empty">
+            Unable to load transaction history.
+          </td>
+        </tr>
+      `;
+
+
+      updateTransactionPagination();
+
+    })
+
+    .getTransactionHistory();
+
+}
+
+
+/* =========================================
+   FILTER TRANSACTIONS
+   ========================================= */
+
+function filterTransactions() {
+
+  transactionCurrentPage = 1;
+
+  renderTransactionHistory();
+
+}
+
+
+/* =========================================
+   GET FILTERED DATA
+   ========================================= */
+
+function getFilteredTransactions() {
+
+  const searchInput =
+    document.getElementById(
+      "transactionSearch"
+    );
+
+
+  const actionFilter =
+    document.getElementById(
+      "transactionActionFilter"
+    );
+
+
+  const searchValue =
+    (
+      searchInput?.value || ""
+    )
+      .toLowerCase()
+      .trim();
+
+
+  const selectedAction =
+    (
+      actionFilter?.value || "all"
+    )
+      .toLowerCase()
+      .trim();
+
+
+  return transactionHistoryData.filter(
+    function(transaction) {
+
+
+      const assetId =
+        (
+          transaction.assetId || ""
+        )
+          .toLowerCase();
+
+
+      const brand =
+        (
+          transaction.brand || ""
+        )
+          .toLowerCase();
+
+
+      const employee =
+        (
+          transaction.employee ||
+          transaction.agentName ||
+          ""
+        )
+          .toLowerCase();
+
+
+      const action =
+        (
+          transaction.action ||
+          transaction.type ||
+          ""
+        )
+          .toLowerCase();
+
+
+      const matchesSearch =
+
+        !searchValue ||
+
+        assetId.includes(searchValue) ||
+
+        brand.includes(searchValue) ||
+
+        employee.includes(searchValue);
+
+
+      const matchesAction =
+
+        selectedAction === "all" ||
+
+        action === selectedAction;
+
+
+      return (
+        matchesSearch &&
+        matchesAction
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================
+   RENDER TRANSACTION HISTORY
+   ========================================= */
+
+function renderTransactionHistory() {
+
+  const tbody =
+    document.getElementById(
+      "transactionHistoryBody"
+    );
+
+
+  if (!tbody) {
+    return;
+  }
+
+
+  const filteredTransactions =
+    getFilteredTransactions();
+
+
+  const totalRows =
+    filteredTransactions.length;
+
+
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(
+        totalRows /
+        transactionRowsPerPage
+      )
+    );
+
+
+  if (
+    transactionCurrentPage >
+    totalPages
+  ) {
+
+    transactionCurrentPage =
+      totalPages;
+
+  }
+
+
+  if (
+    transactionCurrentPage < 1
+  ) {
+
+    transactionCurrentPage = 1;
+
+  }
+
+
+  if (totalRows === 0) {
+
+    tbody.innerHTML = `
+      <tr>
+        <td
+          colspan="5"
+          class="transactions-empty">
+
+          No transaction history found.
+
+        </td>
+      </tr>
+    `;
+
+
+    updateTransactionPagination();
+
+    return;
+
+  }
+
+
+  const startIndex =
+    (
+      transactionCurrentPage - 1
+    ) *
+    transactionRowsPerPage;
+
+
+  const endIndex =
+    startIndex +
+    transactionRowsPerPage;
+
+
+  const pageTransactions =
+    filteredTransactions.slice(
+      startIndex,
+      endIndex
+    );
+
+
+  tbody.innerHTML = "";
+
+
+  pageTransactions.forEach(
+    function(transaction) {
+
+
+      let actionClass =
+        "transaction-action";
+
+
+      const action =
+        (
+          transaction.action ||
+          transaction.type ||
+          ""
+        )
+          .toLowerCase();
+
+
+      if (action === "issued") {
+
+        actionClass +=
+          " transaction-issued";
+
+      }
+      else if (
+        action === "borrowed"
+      ) {
+
+        actionClass +=
+          " transaction-borrowed";
+
+      }
+      else if (
+        action === "returned"
+      ) {
+
+        actionClass +=
+          " transaction-returned";
+
+      }
+
+
+      let formattedDate = "-";
+
+
+      if (transaction.date) {
+
+        const date =
+          new Date(
+            transaction.date
+          );
+
+
+        if (
+          !isNaN(
+            date.getTime()
+          )
+        ) {
+
+          formattedDate =
+            date.toLocaleDateString(
+              "en-US",
+              {
+                month: "2-digit",
+                day: "2-digit",
+                year: "numeric"
+              }
+            );
+
+        }
+
+      }
+
+
+      const employee =
+        transaction.employee ||
+        transaction.agentName ||
+        "-";
+
+
+      const actionText =
+        transaction.action ||
+        transaction.type ||
+        "-";
+
+
+      tbody.innerHTML += `
 
         <tr>
 
-          <td
-            colspan="5"
-            class="transactions-error">
+          <td>
+            ${formattedDate}
+          </td>
 
-            Unable to load transaction history.
+          <td>
 
+            <span
+              class="${actionClass}">
+
+              ${actionText}
+
+            </span>
+
+          </td>
+
+          <td>
+
+            <strong>
+              ${transaction.assetId || "-"}
+            </strong>
+
+          </td>
+
+          <td>
+            ${transaction.brand || "-"}
+          </td>
+
+          <td>
+            ${employee}
           </td>
 
         </tr>
 
       `;
 
-    })
+    }
+  );
 
 
-    .getTransactionHistory();
+  updateTransactionPagination(
+    transactionCurrentPage,
+    totalPages,
+    totalRows
+  );
+
+}
+
+
+/* =========================================
+   PAGINATION UI
+   ========================================= */
+
+function updateTransactionPagination(
+  currentPage,
+  totalPages,
+  totalRows
+) {
+
+  const pagination =
+    document.getElementById("transactionPagination");
+
+  if (!pagination) {
+    return;
+  }
+
+  const start =
+    totalRows === 0
+      ? 0
+      : ((currentPage - 1) * transactionRowsPerPage) + 1;
+
+  const end =
+    Math.min(
+      currentPage * transactionRowsPerPage,
+      totalRows
+    );
+
+  pagination.innerHTML = `
+
+    <div class="pagination-info">
+
+      Showing ${start} - ${end}
+      of ${totalRows}
+
+    </div>
+
+
+    <div class="pagination-controls">
+
+      <button
+        type="button"
+        class="pagination-btn"
+        onclick="changeTransactionPage(-1)"
+        ${currentPage <= 1 ? "disabled" : ""}>
+
+        <span class="material-icons-outlined">
+          chevron_left
+        </span>
+
+        Previous
+
+      </button>
+
+
+      <span class="pagination-page">
+
+        Page ${currentPage} of ${totalPages}
+
+      </span>
+
+
+      <button
+        type="button"
+        class="pagination-btn"
+        onclick="changeTransactionPage(1)"
+        ${currentPage >= totalPages ? "disabled" : ""}>
+
+        Next
+
+        <span class="material-icons-outlined">
+          chevron_right
+        </span>
+
+      </button>
+
+    </div>
+
+  `;
+}
+
+
+/* =========================================
+   CHANGE PAGE
+   ========================================= */
+
+function changeTransactionPage(
+  direction
+) {
+
+  transactionCurrentPage +=
+    direction;
+
+
+  renderTransactionHistory();
+
+}
+
+
+/* =========================================
+   RESET PAGINATION
+   ========================================= */
+
+function resetTransactionPagination() {
+
+  transactionCurrentPage = 1;
+
+  renderTransactionHistory();
 
 }
 
