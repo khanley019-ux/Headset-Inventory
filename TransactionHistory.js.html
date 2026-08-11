@@ -1,0 +1,317 @@
+<script>
+
+function loadTransactionHistory() {
+
+  const dashboardPage =
+    document.getElementById("dashboard-page");
+
+  const inventoryPage =
+    document.getElementById("inventory-page");
+
+  const transactionPage =
+    document.getElementById("transaction-history-page");
+
+
+  if (
+    !dashboardPage ||
+    !inventoryPage ||
+    !transactionPage
+  ) {
+
+    console.error(
+      "Transaction History page elements not found."
+    );
+
+    return;
+  }
+
+
+  // Hide pages
+
+  dashboardPage.style.display = "none";
+
+  inventoryPage.style.display = "none";
+
+
+  // Show Transaction History
+
+  transactionPage.style.display = "block";
+
+
+  // Sidebar active state
+
+  document
+    .getElementById("menuDashboard")
+    ?.classList.remove("active");
+
+  document
+    .getElementById("menuInventory")
+    ?.classList.remove("active");
+
+  document
+    .getElementById("menuTransactions")
+    ?.classList.add("active");
+
+  document
+    .getElementById("menuReports")
+    ?.classList.remove("active");
+
+
+  // Load transaction data
+
+  loadTransactionHistoryData();
+
+}
+
+function loadTransactionHistoryData() {
+
+  const tbody =
+    document.getElementById(
+      "transactionHistoryBody"
+    );
+
+
+  if (!tbody) {
+
+    console.error(
+      "transactionHistoryBody not found."
+    );
+
+    return;
+
+  }
+
+
+  // Loading state
+
+  tbody.innerHTML = `
+
+    <tr>
+
+      <td
+        colspan="5"
+        class="transactions-loading">
+
+        Loading transaction history...
+
+      </td>
+
+    </tr>
+
+  `;
+
+
+  google.script.run
+
+    .withSuccessHandler(function(transactions) {
+
+      console.log("TRANSACTION DATA RECEIVED:", transactions);
+      console.log("TRANSACTION COUNT:", transactions ? transactions.length : "NULL"); 
+
+      console.log(
+        "Transaction History received:",
+        transactions
+      );
+
+
+      transactions =
+        transactions || [];
+
+
+      if (transactions.length === 0) {
+
+        tbody.innerHTML = `
+
+          <tr>
+
+            <td
+              colspan="5"
+              class="transactions-empty">
+
+              No transaction history found.
+
+            </td>
+
+          </tr>
+
+        `;
+
+        return;
+
+      }
+
+
+      tbody.innerHTML = "";
+
+
+      transactions.forEach(
+        function(transaction) {
+
+
+          // =====================================
+          // DATE
+          // =====================================
+
+          let formattedDate = "-";
+
+
+          if (transaction.date) {
+
+            const date =
+              new Date(
+                transaction.date
+              );
+
+
+            if (!isNaN(date.getTime())) {
+
+              formattedDate =
+                date.toLocaleDateString(
+                  "en-US",
+                  {
+                    month: "2-digit",
+                    day: "2-digit",
+                    year: "numeric"
+                  }
+                );
+
+            }
+
+          }
+
+
+          // =====================================
+          // ACTION CLASS
+          // =====================================
+
+          let actionClass =
+            "transaction-action";
+
+
+          const action =
+            (
+              transaction.action || ""
+            )
+            .toLowerCase()
+            .trim();
+
+
+          if (action === "issued") {
+
+            actionClass +=
+              " transaction-issued";
+
+          }
+
+          else if (
+            action === "borrowed"
+          ) {
+
+            actionClass +=
+              " transaction-borrowed";
+
+          }
+
+          else if (
+            action === "returned"
+          ) {
+
+            actionClass +=
+              " transaction-returned";
+
+          }
+
+
+          // =====================================
+          // TABLE ROW
+          // =====================================
+
+          tbody.innerHTML += `
+
+            <tr>
+
+              <td>
+                ${formattedDate}
+              </td>
+
+
+              <td>
+
+                <span
+                  class="${actionClass}">
+
+                  ${transaction.action || "-"}
+
+                </span>
+
+              </td>
+
+
+              <td>
+
+                <strong>
+                  ${transaction.assetId || "-"}
+                </strong>
+
+              </td>
+
+
+              <td>
+                ${transaction.brand || "-"}
+              </td>
+
+
+              <td>
+                ${transaction.employee || "-"}
+              </td>
+
+            </tr>
+
+          `;
+
+
+        }
+      );
+
+
+      console.log(
+        "Transaction History rendered:",
+        transactions.length
+      );
+
+
+    })
+
+
+    .withFailureHandler(function(error) {
+
+      console.error(
+        "Transaction History error:",
+        error
+      );
+
+
+      tbody.innerHTML = `
+
+        <tr>
+
+          <td
+            colspan="5"
+            class="transactions-error">
+
+            Unable to load transaction history.
+
+          </td>
+
+        </tr>
+
+      `;
+
+    })
+
+
+    .getTransactionHistory();
+
+}
+
+</script>

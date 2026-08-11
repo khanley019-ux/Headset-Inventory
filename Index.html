@@ -29,10 +29,20 @@
       <?!= include("Topbar"); ?>
 
       <main id="page-content">
-        <?!= include("Dashboard"); ?> <?!= include("Inventory"); ?>
+
+        <?!= include("Dashboard"); ?>
+
+        <?!= include("Inventory"); ?>
+
+        <?!= include("TransactionHistory"); ?>
+
       </main>
 
     </div>
+
+    <?!= include("Dashboard.js"); ?>
+    <?!= include("Inventory.js"); ?>
+    <?!= include("TransactionHistory.js"); ?>
 
   </div>
 

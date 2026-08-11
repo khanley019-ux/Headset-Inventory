@@ -498,21 +498,26 @@ function loadRecentTransactions() {
 function loadInventory() {
 
   document.getElementById("dashboard-page").style.display = "none";
+  document.getElementById("transaction-history-page").style.display = "none";
   document.getElementById("inventory-page").style.display = "block";
 
   document.getElementById("menuDashboard").classList.remove("active");
+  document.getElementById("menuTransactions").classList.remove("active");
   document.getElementById("menuInventory").classList.add("active");
 
   loadInventoryData();
 
 }
 
+
 function loadDashboard() {
 
   document.getElementById("inventory-page").style.display = "none";
+  document.getElementById("transaction-history-page").style.display = "none";
   document.getElementById("dashboard-page").style.display = "block";
 
   document.getElementById("menuInventory").classList.remove("active");
+  document.getElementById("menuTransactions").classList.remove("active");
   document.getElementById("menuDashboard").classList.add("active");
 
   loadDashboardStats();

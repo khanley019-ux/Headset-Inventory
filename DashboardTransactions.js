@@ -1,33 +1,9 @@
-function getRecentTransactions() {
+function getTransactionHistory() {
 
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
 
   const transactions = [];
-
-
-  // ==================================================
-  // HELPER - FORMAT DATE
-  // ==================================================
-
-  function formatDate(date) {
-
-    if (!date) {
-      return "";
-    }
-
-    if (date instanceof Date) {
-
-      return Utilities.formatDate(
-        date,
-        Session.getScriptTimeZone(),
-        "MM/dd/yyyy"
-      );
-
-    }
-
-    return String(date);
-
-  }
 
 
   // ==================================================
@@ -49,8 +25,8 @@ function getRecentTransactions() {
       const data =
         issueSheet
           .getRange(
-            2,
-            2,
+            2,      // Row 2
+            2,      // Column B
             lastRow - 1,
             6
           )
@@ -71,6 +47,12 @@ function getRecentTransactions() {
         const brand =
           row[3];
 
+        const issuedBy =
+          row[4];
+
+        const status =
+          row[5];
+
 
         if (!assetId) {
           return;
@@ -79,15 +61,26 @@ function getRecentTransactions() {
 
         transactions.push({
 
-          date: formatDate(date),
+          date: date,
 
           action: "Issued",
 
-          assetId: String(assetId),
+          assetId:
+            String(assetId),
 
-          brand: String(brand || ""),
+          brand:
+            String(brand || ""),
 
-          employee: String(employee || "")
+          employee:
+            String(employee || ""),
+
+          details:
+            issuedBy
+              ? "Issued by " + issuedBy
+              : "",
+
+          source:
+            "Issuance Logs"
 
         });
 
@@ -139,23 +132,54 @@ function getRecentTransactions() {
         const brand =
           row[3];
 
+        const issuedBy =
+          row[4];
+
+        const status =
+          String(row[5] || "")
+            .toLowerCase()
+            .trim();
+
 
         if (!assetId) {
           return;
         }
 
 
+        let action =
+          "Borrowed";
+
+
+        if (status === "returned") {
+
+          action =
+            "Returned";
+
+        }
+
+
         transactions.push({
 
-          date: formatDate(date),
+          date: date,
 
-          action: "Borrowed",
+          action: action,
 
-          assetId: String(assetId),
+          assetId:
+            String(assetId),
 
-          brand: String(brand || ""),
+          brand:
+            String(brand || ""),
 
-          employee: String(employee || "")
+          employee:
+            String(employee || ""),
+
+          details:
+            issuedBy
+              ? "Processed by " + issuedBy
+              : "",
+
+          source:
+            "Borrow Logs"
 
         });
 
@@ -185,8 +209,8 @@ function getRecentTransactions() {
       const data =
         returnSheet
           .getRange(
-            3,
-            2,
+            3,      // Row 3
+            2,      // Column B
             lastRow - 2,
             7
           )
@@ -207,23 +231,72 @@ function getRecentTransactions() {
         const brand =
           row[3];
 
+        const statusUponReturn =
+          row[4];
+
+        const checkedBy =
+          row[5];
+
+        const remarks =
+          row[6];
+
 
         if (!assetId) {
           return;
         }
 
 
+        let details = "";
+
+
+        if (statusUponReturn) {
+
+          details =
+            String(statusUponReturn);
+
+        }
+
+
+        if (checkedBy) {
+
+          details +=
+            details
+              ? " • Checked by " + checkedBy
+              : "Checked by " + checkedBy;
+
+        }
+
+
+        if (remarks) {
+
+          details +=
+            details
+              ? " • " + remarks
+              : String(remarks);
+
+        }
+
+
         transactions.push({
 
-          date: formatDate(date),
+          date: date,
 
           action: "Returned",
 
-          assetId: String(assetId),
+          assetId:
+            String(assetId),
 
-          brand: String(brand || ""),
+          brand:
+            String(brand || ""),
 
-          employee: String(employee || "")
+          employee:
+            String(employee || ""),
+
+          details:
+            details,
+
+          source:
+            "Return Logs"
 
         });
 
@@ -251,11 +324,48 @@ function getRecentTransactions() {
 
   });
 
-
   // ==================================================
-  // RETURN LATEST 10
+  // CONVERT DATES FOR GOOGLE.SCRIPT.RUN
   // ==================================================
 
-  return transactions.slice(0, 10);
+  transactions.forEach(function(transaction) {
+
+    if (transaction.date instanceof Date) {
+
+      transaction.date =
+        transaction.date.toISOString();
+
+    }
+
+  });
+
+
+  console.log(
+    "Total transactions:",
+    transactions.length
+  );
+
+
+  return transactions;
+
+}
+
+function testGetTransactionHistory() {
+
+  const result =
+    getTransactionHistory();
+
+  console.log(
+    "Returned transactions:",
+    result.length
+  );
+
+  console.log(
+    JSON.stringify(
+      result.slice(0, 5),
+      null,
+      2
+    )
+  );
 
 }
