@@ -9,12 +9,86 @@
 
   </div>
 
+  <!-- =========================================
+     TRANSACTION SUMMARY CARDS
+     ========================================= -->
+
+  <div class="transaction-summary">
+
+    <div class="transaction-stat-card">
+
+      <div class="transaction-stat-icon">
+        <span class="material-icons-outlined">
+          history
+        </span>
+      </div>
+
+      <div>
+        <h3 id="transactionStatTotal">0</h3>
+        <p>Total Transactions</p>
+      </div>
+
+    </div>
+
+
+    <div class="transaction-stat-card">
+
+      <div class="transaction-stat-icon">
+        <span class="material-icons-outlined">
+          assignment_ind
+        </span>
+      </div>
+
+      <div>
+        <h3 id="transactionStatIssued">0</h3>
+        <p>Issued</p>
+      </div>
+
+    </div>
+
+
+    <div class="transaction-stat-card">
+
+      <div class="transaction-stat-icon">
+        <span class="material-icons-outlined">
+          headphones
+        </span>
+      </div>
+
+      <div>
+        <h3 id="transactionStatBorrowed">0</h3>
+        <p>Borrowed</p>
+      </div>
+
+    </div>
+
+
+    <div class="transaction-stat-card">
+
+      <div class="transaction-stat-icon">
+        <span class="material-icons-outlined">
+          assignment_return
+        </span>
+      </div>
+
+      <div>
+        <h3 id="transactionStatReturned">0</h3>
+        <p>Returned</p>
+      </div>
+
+    </div>
+
+  </div>
 
   <!-- FILTER TOOLBAR -->
 
-  <div class="toolbar">
+  <!-- =========================================
+     TRANSACTION FILTER TOOLBAR
+     ========================================= -->
 
-    <div class="search-box">
+  <div class="transaction-toolbar">
+
+    <div class="transaction-search">
 
       <span class="material-icons-outlined">
         search
@@ -29,7 +103,7 @@
     </div>
 
 
-    <div class="filter-box">
+    <div class="transaction-filter">
 
       <span class="material-icons-outlined">
         filter_list
@@ -39,13 +113,21 @@
         id="transactionActionFilter"
         onchange="filterTransactions()">
 
-        <option value="all">All Actions</option>
+        <option value="all">
+          All Actions
+        </option>
 
-        <option value="issued">Issued</option>
+        <option value="issued">
+          Issued
+        </option>
 
-        <option value="borrowed">Borrowed</option>
+        <option value="borrowed">
+          Borrowed
+        </option>
 
-        <option value="returned">Returned</option>
+        <option value="returned">
+          Returned
+        </option>
 
       </select>
 

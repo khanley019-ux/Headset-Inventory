@@ -1,5 +1,9 @@
 <div id="inventory-page" class="page" style="display:none;">
 
+  <!-- =========================================
+       PAGE HEADER
+       ========================================= -->
+
   <div class="page-header">
 
     <div>
@@ -7,129 +11,198 @@
       <p>Manage all headset assets</p>
     </div>
 
+  </div>
+
+
+  <!-- =========================================
+       ACTION BUTTONS
+       ========================================= -->
+
+  <!-- =========================================
+     INVENTORY QUICK ACTIONS
+     ========================================= -->
+
+<section class="dashboard-section inventory-quick-actions">
+
+  <div class="quick-actions">
+
+
+    <!-- ADD HEADSET -->
+
     <button
-      class="btn-primary"
-      id="btnAddHeadset"
+      type="button"
+      class="quick-action-btn"
       onclick="openAddHeadsetModal()">
 
       <span class="material-icons-outlined">
-        add
+        add_circle
       </span>
 
-      Add Headset
+      <div>
+        <strong>Add Headset</strong>
+        <small>Add a new headset to inventory</small>
+      </div>
 
     </button>
 
 
+    <!-- ISSUE HEADSET -->
+
     <button
-      class="btn-primary"
+      type="button"
+      class="quick-action-btn"
       onclick="openIssueHeadsetModal()">
 
       <span class="material-icons-outlined">
-        assignment_returned
+        assignment_ind
       </span>
 
-      Issue Headset
+      <div>
+        <strong>Issue Headset</strong>
+        <small>Assign a headset to an employee</small>
+      </div>
 
     </button>
 
 
+    <!-- BORROW HEADSET -->
+
     <button
-      class="btn-primary"
+      type="button"
+      class="quick-action-btn"
       onclick="openBorrowHeadsetModal()">
 
       <span class="material-icons-outlined">
         headphones
       </span>
 
-      Borrow Headset
+      <div>
+        <strong>Borrow Headset</strong>
+        <small>Record a temporary headset loan</small>
+      </div>
 
     </button>
 
 
+    <!-- RETURN HEADSET -->
+
     <button
-      class="btn-primary"
+      type="button"
+      class="quick-action-btn"
       onclick="openReturnHeadsetModal()">
 
       <span class="material-icons-outlined">
         assignment_return
       </span>
 
-      Return Headset
+      <div>
+        <strong>Return Headset</strong>
+        <small>Process a returned headset</small>
+      </div>
 
     </button>
 
-  </div>
-
-<div class="inventory-toolbar">
-
-  <div class="inventory-search">
-
-    <span class="material-icons-outlined">
-      search
-    </span>
-
-    <input
-      type="text"
-      id="inventorySearch"
-      placeholder="Search Asset ID, Brand, Model, or Serial Number..."
-      oninput="searchInventory()">
 
   </div>
 
+</section>
 
-  <div class="inventory-filter">
+  <!-- =========================================
+       SEARCH + FILTER TOOLBAR
+       ========================================= -->
 
-    <span class="material-icons-outlined">
-      filter_list
-    </span>
+  <div class="inventory-toolbar">
 
-    <select
-      id="inventoryStatusFilter"
-      onchange="filterInventory()">
+    <div class="inventory-search">
 
-      <option value="">All Status</option>
-      <option value="Available">Available</option>
-      <option value="Assigned">Assigned</option>
-      <option value="Under Repair">Under Repair</option>
-      <option value="Damaged">Damaged</option>
-      <option value="Lost">Lost</option>
-      <option value="Borrowed">Borrowed</option>
+      <span class="material-icons-outlined">
+        search
+      </span>
 
-    </select>
+      <input
+        type="text"
+        id="inventorySearch"
+        placeholder="Search Asset ID, Brand, Model, or Serial Number..."
+        oninput="searchInventory()">
+
+    </div>
+
+
+    <div class="inventory-filter">
+
+      <span class="material-icons-outlined">
+        filter_list
+      </span>
+
+      <select
+        id="inventoryStatusFilter"
+        onchange="filterInventory()">
+
+        <option value="">All Status</option>
+        <option value="Available">Available</option>
+        <option value="Assigned">Assigned</option>
+        <option value="Under Repair">Under Repair</option>
+        <option value="Damaged">Damaged</option>
+        <option value="Lost">Lost</option>
+        <option value="Borrowed">Borrowed</option>
+
+      </select>
+
+    </div>
 
   </div>
 
-</div>
 
-  <div class="table-container" style="overflow:auto;">
+  <!-- =========================================
+       TABLE CARD
+       ========================================= -->
 
-    <table id="inventoryTable" class="inventory-table">
+  <div class="inventory-table-card">
 
-      <thead>
+    <div class="table-container">
 
-        <tr>
+      <table
+        id="inventoryTable"
+        class="inventory-table">
 
-          <th>Asset ID</th>
-          <th>Brand</th>
-          <th>Model</th>
-          <th>Serial Number</th>
-          <th>Status</th>
-          <th>Condition</th>
-          <th>Assigned To</th>
-          <th style="text-align:center;">Action</th>
+        <thead>
 
-        </tr>
+          <tr>
 
-      </thead>
+            <th>Asset ID</th>
+            <th>Brand</th>
+            <th>Model</th>
+            <th>Serial Number</th>
+            <th>Status</th>
+            <th>Condition</th>
+            <th>Assigned To</th>
+            <th style="text-align:center;">
+              Action
+            </th>
 
-      <tbody>
+          </tr>
 
-      </tbody>
+        </thead>
 
-    </table>
 
-    <div id="inventoryPagination" class="inventory-pagination"></div>
+        <tbody>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <!-- =========================================
+         PAGINATION
+         ========================================= -->
+
+    <div
+      id="inventoryPagination"
+      class="inventory-pagination">
+
+    </div>
 
   </div>
 

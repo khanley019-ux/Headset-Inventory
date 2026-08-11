@@ -110,6 +110,7 @@ function loadTransactionHistoryData() {
       transactionHistoryData =
         transactions || [];
 
+      updateTransactionSummary();
 
       transactionCurrentPage = 1;
 
@@ -604,6 +605,113 @@ function resetTransactionPagination() {
   transactionCurrentPage = 1;
 
   renderTransactionHistory();
+
+}
+
+/* =========================================
+   TRANSACTION SUMMARY
+   ========================================= */
+
+function updateTransactionSummary() {
+
+  const transactions =
+    transactionHistoryData || [];
+
+
+  let issued = 0;
+  let borrowed = 0;
+  let returned = 0;
+
+
+  transactions.forEach(function(transaction) {
+
+    const action =
+      (
+        transaction.action ||
+        transaction.type ||
+        ""
+      )
+        .toLowerCase()
+        .trim();
+
+
+    if (action === "issued") {
+
+      issued++;
+
+    }
+    else if (action === "borrowed") {
+
+      borrowed++;
+
+    }
+    else if (action === "returned") {
+
+      returned++;
+
+    }
+
+  });
+
+
+  const total =
+    transactions.length;
+
+
+  const totalElement =
+    document.getElementById(
+      "transactionStatTotal"
+    );
+
+
+  const issuedElement =
+    document.getElementById(
+      "transactionStatIssued"
+    );
+
+
+  const borrowedElement =
+    document.getElementById(
+      "transactionStatBorrowed"
+    );
+
+
+  const returnedElement =
+    document.getElementById(
+      "transactionStatReturned"
+    );
+
+
+  if (totalElement) {
+
+    totalElement.textContent =
+      total;
+
+  }
+
+
+  if (issuedElement) {
+
+    issuedElement.textContent =
+      issued;
+
+  }
+
+
+  if (borrowedElement) {
+
+    borrowedElement.textContent =
+      borrowed;
+
+  }
+
+
+  if (returnedElement) {
+
+    returnedElement.textContent =
+      returned;
+
+  }
 
 }
 
