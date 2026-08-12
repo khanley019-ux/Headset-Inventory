@@ -13,7 +13,6 @@ function getTransactionHistory() {
   const issueSheet =
     ss.getSheetByName("Issuance Logs");
 
-
   if (issueSheet) {
 
     const lastRow =
@@ -49,9 +48,6 @@ function getTransactionHistory() {
 
         const issuedBy =
           row[4];
-
-        const status =
-          row[5];
 
 
         if (!assetId) {
@@ -98,7 +94,6 @@ function getTransactionHistory() {
   const borrowSheet =
     ss.getSheetByName("Borrow Logs");
 
-
   if (borrowSheet) {
 
     const lastRow =
@@ -135,34 +130,21 @@ function getTransactionHistory() {
         const issuedBy =
           row[4];
 
-        const status =
-          String(row[5] || "")
-            .toLowerCase()
-            .trim();
-
 
         if (!assetId) {
           return;
         }
 
 
-        let action =
-          "Borrowed";
-
-
-        if (status === "returned") {
-
-          action =
-            "Returned";
-
-        }
-
+        // IMPORTANT:
+        // Borrow Logs are ALWAYS "Borrowed"
+        // regardless of the Status column.
 
         transactions.push({
 
           date: date,
 
-          action: action,
+          action: "Borrowed",
 
           assetId:
             String(assetId),
@@ -196,7 +178,6 @@ function getTransactionHistory() {
 
   const returnSheet =
     ss.getSheetByName("Return Logs");
-
 
   if (returnSheet) {
 
@@ -324,6 +305,7 @@ function getTransactionHistory() {
 
   });
 
+
   // ==================================================
   // CONVERT DATES FOR GOOGLE.SCRIPT.RUN
   // ==================================================
@@ -347,6 +329,31 @@ function getTransactionHistory() {
 
 
   return transactions;
+
+}
+
+function getRecentTransactions() {
+
+  console.log("=================================");
+  console.log("getRecentTransactions CALLED");
+  console.log("=================================");
+
+  const transactions = getTransactionHistory();
+
+  console.log(
+    "Transactions received:",
+    transactions.length
+  );
+
+  const recentTransactions =
+    transactions.slice(0, 5);
+
+  console.log(
+    "Recent transactions:",
+    JSON.stringify(recentTransactions)
+  );
+
+  return recentTransactions;
 
 }
 

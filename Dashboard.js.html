@@ -16,10 +16,16 @@ function loadDashboardStats() {
       setDashboardValue("statIssuedToday", stats.issuedToday);
       setDashboardValue("statReturnedToday", stats.returnedToday);
 
+      // Load / refresh inventory status chart
+      loadInventoryStatusChart(stats);
+
     })
     .withFailureHandler(function(error) {
 
-      console.error("Dashboard statistics error:", error);
+      console.error(
+        "Dashboard statistics error:",
+        error
+      );
 
       setDashboardValue("statTotal", 0);
       setDashboardValue("statAvailable", 0);
@@ -38,14 +44,21 @@ function loadDashboardStats() {
 
 function setDashboardValue(elementId, value) {
 
-  const element = document.getElementById(elementId);
+  const element =
+    document.getElementById(elementId);
 
   if (!element) {
-    console.warn("Dashboard element not found:", elementId);
+
+    console.warn(
+      "Dashboard element not found:",
+      elementId
+    );
+
     return;
   }
 
-  element.textContent = value ?? 0;
+  element.textContent =
+    value ?? 0;
 
 }
 
@@ -56,33 +69,68 @@ function refreshDashboard() {
 
 }
 
-<script>
+
+/* =========================================
+   RECENT TRANSACTIONS
+   ========================================= */
 
 function loadRecentTransactions() {
 
-  const tbody = document.getElementById("recentTransactionsBody");
+  console.log(
+    "LOAD RECENT TRANSACTIONS STARTED"
+  );
 
-  if (!tbody) return;
+  const tbody =
+    document.getElementById(
+      "recentTransactionsBody"
+    );
+
+  if (!tbody) {
+
+    console.error(
+      "recentTransactionsBody NOT FOUND"
+    );
+
+    return;
+  }
+
 
   tbody.innerHTML = `
     <tr>
-      <td colspan="5" class="transactions-loading">
+      <td
+        colspan="5"
+        class="transactions-loading">
+
         Loading recent transactions...
+
       </td>
     </tr>
   `;
 
+
   google.script.run
+
     .withSuccessHandler(function(transactions) {
 
-      transactions = transactions || [];
+      console.log(
+        "RECENT TRANSACTIONS RECEIVED:",
+        transactions
+      );
+
+      transactions =
+        transactions || [];
+
 
       if (transactions.length === 0) {
 
         tbody.innerHTML = `
           <tr>
-            <td colspan="5" class="transactions-empty">
+            <td
+              colspan="5"
+              class="transactions-empty">
+
               No recent transactions found.
+
             </td>
           </tr>
         `;
@@ -90,47 +138,75 @@ function loadRecentTransactions() {
         return;
       }
 
+
       tbody.innerHTML = "";
+
 
       transactions.forEach(function(transaction) {
 
         let actionClass = "";
 
-        switch ((transaction.type || "").toLowerCase()) {
+
+        switch (
+          (transaction.action || "")
+            .toLowerCase()
+            .trim()
+        ) {
 
           case "issued":
-            actionClass = "transaction-issued";
+            actionClass =
+              "transaction-issued";
             break;
 
           case "borrowed":
-            actionClass = "transaction-borrowed";
+            actionClass =
+              "transaction-borrowed";
             break;
 
           case "returned":
-            actionClass = "transaction-returned";
+            actionClass =
+              "transaction-returned";
             break;
 
           default:
             actionClass = "";
+
         }
 
-        const date = transaction.date
-          ? new Date(transaction.date).toLocaleString()
-          : "-";
+
+        const date =
+          transaction.date
+            ? new Date(
+                transaction.date
+              ).toLocaleString()
+            : "-";
+
 
         tbody.innerHTML += `
+
           <tr>
 
-            <td>${date}</td>
-
             <td>
-              <span class="transaction-badge ${actionClass}">
-                ${transaction.type || "-"}
-              </span>
+              ${date}
             </td>
 
             <td>
-              <strong>${transaction.assetId || "-"}</strong>
+
+              <span
+                class="transaction-badge ${actionClass}">
+
+                ${transaction.action || "-"}
+
+              </span>
+
+            </td>
+
+            <td>
+
+              <strong>
+                ${transaction.assetId || "-"}
+              </strong>
+
             </td>
 
             <td>
@@ -138,121 +214,44 @@ function loadRecentTransactions() {
             </td>
 
             <td>
-              ${transaction.agentName || "-"}
+              ${transaction.employee || "-"}
             </td>
 
           </tr>
+
         `;
 
       });
 
     })
+
     .withFailureHandler(function(error) {
 
-      console.error("Recent transactions error:", error);
+      console.error(
+        "Recent transactions error:",
+        error
+      );
 
       tbody.innerHTML = `
+
         <tr>
-          <td colspan="5" class="transactions-error">
+
+          <td
+            colspan="5"
+            class="transactions-error">
+
             Unable to load recent transactions.
+
           </td>
+
         </tr>
+
       `;
 
     })
+
     .getRecentTransactions();
 
 }
 
-
-<script>
-
-<script>
-
-/* =========================================
-   INVENTORY PAGINATION
-   ========================================= */
-
-let inventoryCurrentPage = 1;
-const inventoryRowsPerPage = 10;
-
-
- {
-
-  let pagination =
-    document.getElementById("inventoryPagination");
-
-  if (!pagination) return;
-
-  pagination.innerHTML = `
-
-    <div class="pagination-info">
-
-      Showing
-      ${
-        totalRows === 0
-          ? 0
-          : ((currentPage - 1) * inventoryRowsPerPage) + 1
-      }
-
-      -
-
-      ${
-        Math.min(
-          currentPage * inventoryRowsPerPage,
-          totalRows
-        )
-      }
-
-      of ${totalRows}
-
-    </div>
-
-
-    <div class="pagination-controls">
-
-      <button
-        type="button"
-        class="pagination-btn"
-        onclick="changeInventoryPage(-1)"
-        ${currentPage <= 1 ? "disabled" : ""}>
-
-        <span class="material-icons-outlined">
-          chevron_left
-        </span>
-
-        Previous
-
-      </button>
-
-
-      <span class="pagination-page">
-
-        Page ${currentPage} of ${totalPages}
-
-      </span>
-
-
-      <button
-        type="button"
-        class="pagination-btn"
-        onclick="changeInventoryPage(1)"
-        ${currentPage >= totalPages ? "disabled" : ""}>
-
-        Next
-
-        <span class="material-icons-outlined">
-          chevron_right
-        </span>
-
-      </button>
-
-    </div>
-
-  `;
-
-}
-
-
 </script>
-

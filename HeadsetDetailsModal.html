@@ -90,8 +90,29 @@
 
     <div class="modal-footer">
 
-      <button class="btn-secondary" onclick="closeHeadsetDetails()">
+      <button
+        type="button"
+        class="btn-primary"
+        onclick="generateEAR(
+          document.getElementById('detailAssetId').textContent
+        )">
+
+        <span class="material-icons-outlined">
+          description
+        </span>
+
+        Generate EAR
+
+      </button>
+
+
+      <button
+        type="button"
+        class="btn-secondary"
+        onclick="closeHeadsetDetails()">
+
         Close
+
       </button>
 
     </div>

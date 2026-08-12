@@ -41,3 +41,18 @@ function getDashboardStats() {
   };
 
 }
+
+function getRecentTransactions() {
+
+  // Get the same transaction data used
+  // by the Transaction History page
+
+  const transactions =
+    getTransactionHistory();
+
+
+  // Return only the latest 5 transactions
+
+  return transactions.slice(0, 5);
+
+}

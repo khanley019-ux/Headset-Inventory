@@ -530,7 +530,8 @@ function loadInventoryData() {
   google.script.run
     .withSuccessHandler(function(data) {
 
-      const tbody = document.querySelector("#inventoryTable tbody");
+      const tbody =
+        document.querySelector("#inventoryTable tbody");
 
       tbody.innerHTML = "";
 
@@ -538,64 +539,2310 @@ function loadInventoryData() {
 
         let statusClass = "";
 
-        switch ((item.status || "").toLowerCase()) {
+        switch (
+          (item.status || "").toLowerCase()
+        ) {
+
           case "available":
             statusClass = "available";
             break;
+
           case "issued":
             statusClass = "issued";
             break;
+
           case "borrowed":
             statusClass = "borrowed";
             break;
+
           case "damaged":
             statusClass = "damaged";
             break;
+
           default:
             statusClass = "default";
+
         }
 
+
+        // ==========================================
+        // EAR BUTTON
+        // ==========================================
+
+        const isAssigned =
+          (item.status || "")
+            .toLowerCase()
+            .trim() === "assigned";
+
+
+        const earButton = isAssigned
+
+          ? `
+            <button
+              class="btn-icon"
+              onclick="generateEAR('${item.assetId}')"
+              title="Generate EAR">
+
+              <span class="material-icons-outlined">
+                description
+              </span>
+
+            </button>
+          `
+
+          : "";
+
+
+        // ==========================================
+        // INVENTORY ROW
+        // ==========================================
+
         tbody.innerHTML += `
+
           <tr>
-            <td>${item.assetId}</td>
-            <td>${item.brand}</td>
-            <td>${item.model}</td>
-            <td>${item.serialNumber}</td>
 
             <td>
-              <span class="status-badge ${statusClass}">
-                ${item.status || "-"}
-              </span>
+              ${item.assetId}
             </td>
 
-            <td>${item.condition || "-"}</td>
-            <td>${item.assignedTo || "-"}</td>
 
-            <td style="text-align:center;">
+            <td>
+              ${item.brand}
+            </td>
+
+
+            <td>
+              ${item.model}
+            </td>
+
+
+            <td>
+              ${item.serialNumber}
+            </td>
+
+
+            <td>
+
+              <span
+                class="status-badge ${statusClass}">
+
+                ${item.status || "-"}
+
+              </span>
+
+            </td>
+
+
+            <td>
+              ${item.condition || "-"}
+            </td>
+
+
+            <td>
+              ${item.assignedTo || "-"}
+            </td>
+
+
+            <td
+              style="text-align:center;">
+
+              <!-- VIEW -->
+
               <button
-                  class="btn-icon"
-                  onclick="viewHeadset(this)"
-                  data-assetid="${item.assetId}"
-                  title="View Details">
-                  <span class="material-icons-outlined">visibility</span>
+                class="btn-icon"
+                onclick="viewHeadset(this)"
+                data-assetid="${item.assetId}"
+                title="View Details">
+
+                <span class="material-icons-outlined">
+                  visibility
+                </span>
+
               </button>
+
+
+              <!-- EAR -->
+
+              ${earButton}
+
             </td>
 
           </tr>
+
         `;
 
       });
+
 
       initializeInventoryPagination();
 
     })
     .withFailureHandler(function(error) {
 
-      console.error(error);
-      alert(error.message);
+      console.error(
+        "Inventory loading error:",
+        error
+      );
+
+      alert(
+        error.message ||
+        "Unable to load inventory."
+      );
 
     })
     .getInventory();
+
+}
+
+
+function generateEAR(assetId) {
+
+  assetId =
+    String(assetId || "").trim();
+
+  if (!assetId) {
+
+    alert("Asset ID is missing.");
+
+    return;
+  }
+
+  console.log("=================================");
+  console.log("GENERATE EAR CLICKED");
+  console.log("Asset ID:", assetId);
+  console.log("=================================");
+
+  // ==========================================
+  // OPEN WINDOW IMMEDIATELY
+  // Prevent popup blocker
+  // ==========================================
+
+  const printWindow =
+    window.open(
+      "",
+      "_blank",
+      "width=900,height=1000"
+    );
+
+  if (!printWindow) {
+
+    alert(
+      "Please allow pop-ups for this Google Apps Script web app."
+    );
+
+    return;
+  }
+
+  // ==========================================
+  // TEMPORARY LOADING PAGE
+  // ==========================================
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+
+    <html>
+
+    <head>
+
+      <title>Generating EAR...</title>
+
+      <style>
+
+        body {
+          font-family: Arial, sans-serif;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          margin: 0;
+          background: #f5f5f5;
+        }
+
+        .loading {
+          text-align: center;
+          font-size: 18px;
+        }
+
+        .spinner {
+          width: 35px;
+          height: 35px;
+          border: 4px solid #ddd;
+          border-top: 4px solid #1688d4;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+      </style>
+
+    </head>
+
+    <body>
+
+      <div class="loading">
+
+        <div class="spinner"></div>
+
+        Generating EAR...
+
+      </div>
+
+    </body>
+
+    </html>
+  `);
+
+  printWindow.document.close();
+
+
+  // ==========================================
+  // GET EAR DATA
+  // ==========================================
+
+  google.script.run
+
+    .withSuccessHandler(function(earData) {
+
+      console.log(
+        "EAR DATA RECEIVED:",
+        earData
+      );
+
+      if (!earData) {
+
+        printWindow.close();
+
+        alert(
+          "Unable to retrieve EAR information."
+        );
+
+        return;
+      }
+
+
+      // ======================================
+      // GET DIPH LOGO
+      // ======================================
+
+      google.script.run
+
+        .withSuccessHandler(function(logoData) {
+
+          console.log(
+            "DIPH LOGO RECEIVED"
+          );
+
+          buildEARPreview(
+            printWindow,
+            earData,
+            logoData
+          );
+
+        })
+
+        .withFailureHandler(function(error) {
+
+          console.error(
+            "DIPH logo error:",
+            error
+          );
+
+          printWindow.close();
+
+          alert(
+            "Unable to load the DIPH logo.\n\n" +
+            (error.message || error)
+          );
+
+        })
+
+        .getDIPHLogo();
+
+    })
+
+    .withFailureHandler(function(error) {
+
+      console.error(
+        "EAR generation error:",
+        error
+      );
+
+      printWindow.close();
+
+      alert(
+        error && error.message
+          ? error.message
+          : "Unable to generate EAR."
+      );
+
+    })
+
+    .getEARData(assetId);
+
+}
+
+
+/* ==================================================
+   BUILD EAR PREVIEW
+   ================================================== */
+
+function buildEARPreview(
+  printWindow,
+  earData,
+  logoData
+) {
+
+  const issuedDate =
+    formatEARDate(
+      earData.issuedDate ||
+      earData.receivedDate
+    );
+
+
+  const receivedDate =
+    formatEARDate(
+      earData.receivedDate
+    );
+
+
+  const escapeHTML =
+    function(value) {
+
+      return String(
+        value ?? ""
+      )
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+    };
+
+
+  const equipmentName =
+    escapeHTML(
+      earData.equipmentName || "Headset"
+    );
+
+
+  const brand =
+    escapeHTML(
+      earData.brand || ""
+    );
+
+
+  const model =
+    escapeHTML(
+      earData.model || ""
+    );
+
+
+  const serialNumber =
+    escapeHTML(
+      earData.serialNumber || ""
+    );
+
+
+  const assetId =
+    escapeHTML(
+      earData.assetId || ""
+    );
+
+
+  const condition =
+    escapeHTML(
+      earData.condition || ""
+    );
+
+
+  const receivedName =
+    escapeHTML(
+      earData.receivedName || ""
+    );
+
+
+  const issuedBy =
+    escapeHTML(
+      earData.issuedBy || ""
+    );
+
+
+  // ==========================================
+  // POSITIONS
+  // ==========================================
+
+  // Intentionally blank based on your requirement.
+
+  const receivedPosition =
+    escapeHTML(
+      earData.receivedPosition || ""
+    );
+
+
+  const issuedByPosition =
+    escapeHTML(
+      earData.issuedByPosition || ""
+    );
+
+
+  // ==========================================
+  // EAR HTML
+  // ==========================================
+
+  printWindow.document.open();
+
+  printWindow.document.write(`
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Equipment Acknowledgement Receipt - ${assetId}</title>
+
+
+<style>
+
+/* =================================================
+   PAGE
+   ================================================= */
+
+@page {
+
+  size: A4 portrait;
+
+  margin: 10mm;
+
+}
+
+
+* {
+
+  box-sizing: border-box;
+
+}
+
+
+html,
+body {
+
+  margin: 0;
+
+  padding: 0;
+
+  background: white;
+
+  font-family: Arial, Helvetica, sans-serif;
+
+  color: #000;
+
+}
+
+
+body {
+
+  font-size: 10pt;
+
+}
+
+
+/* =================================================
+   SCREEN TOOLBAR
+   ================================================= */
+
+.print-toolbar {
+
+  width: 100%;
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  padding: 15px;
+
+  background: #f5f5f5;
+
+  border-bottom: 1px solid #ddd;
+
+  position: sticky;
+
+  top: 0;
+
+  z-index: 100;
+
+}
+
+
+.print-button,
+.close-button {
+
+  border: none;
+
+  border-radius: 6px;
+
+  padding: 12px 22px;
+
+  font-size: 14px;
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+}
+
+
+.print-button {
+
+  background: #1677e8;
+
+  color: white;
+
+}
+
+
+.close-button {
+
+  background: #64748b;
+
+  color: white;
+
+}
+
+
+/* =================================================
+   EAR PAGE
+   ================================================= */
+
+.ear-page {
+
+  width: 190mm;
+
+  min-height: 277mm;
+
+  margin: 0 auto;
+
+  padding: 3mm;
+
+}
+
+
+/* =================================================
+   TOP DATE
+   ================================================= */
+
+.top-date {
+
+  height: 9mm;
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  align-items: flex-start;
+
+  font-size: 9pt;
+
+  font-weight: bold;
+
+  padding-right: 2mm;
+
+}
+
+
+.top-date-label {
+
+  margin-right: 45mm;
+
+}
+
+
+/* =================================================
+   LOGO
+   ================================================= */
+
+.logo-area {
+
+  text-align: center;
+
+  margin-top: 1mm;
+
+  margin-bottom: 2mm;
+
+}
+
+
+.logo {
+
+  width: 55mm;
+
+  max-height: 27mm;
+
+  object-fit: contain;
+
+}
+
+
+/* =================================================
+   TITLE
+   ================================================= */
+
+.ear-title {
+
+  text-align: center;
+
+  font-size: 14pt;
+
+  font-weight: bold;
+
+  margin-top: 1mm;
+
+  margin-bottom: 5mm;
+
+}
+
+
+/* =================================================
+   MAIN BORDER
+   ================================================= */
+
+.ear-border {
+
+  border: 1.2px solid #000;
+
+}
+
+
+/* =================================================
+   EQUIPMENT DETAILS
+   ================================================= */
+
+.section-title {
+
+  text-align: center;
+
+  font-size: 12pt;
+
+  font-weight: bold;
+
+  padding: 2mm 0;
+
+  border-bottom: 1px solid #000;
+
+}
+
+
+.equipment-row {
+
+  display: grid;
+
+  grid-template-columns: 55mm 1fr;
+
+  min-height: 8mm;
+
+  border-bottom: 1px solid #000;
+
+}
+
+
+.equipment-label {
+
+  border-right: 1px solid #000;
+
+  padding: 1.5mm 2mm;
+
+  font-size: 9pt;
+
+  font-weight: bold;
+
+  display: flex;
+
+  align-items: center;
+
+}
+
+
+.equipment-value {
+
+  padding: 1.5mm 2mm;
+
+  font-size: 9pt;
+
+  font-weight: bold;
+
+  text-align: center;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+}
+
+
+/* =================================================
+   TERMS & CONDITIONS
+   ================================================= */
+
+.terms {
+
+  padding: 6mm 3mm 7mm 3mm;
+
+  min-height: 105mm;
+
+}
+
+
+.terms-title {
+
+  font-size: 10pt;
+
+  font-weight: bold;
+
+  margin-bottom: 7mm;
+
+}
+
+
+.terms p {
+
+  font-size: 9pt;
+
+  line-height: 1.35;
+
+  margin: 0 0 6mm 0;
+
+}
+
+
+/* =================================================
+   ACKNOWLEDGEMENTS
+   ================================================= */
+
+.ack-title {
+
+  text-align: center;
+
+  font-size: 11pt;
+
+  font-weight: bold;
+
+  padding: 2mm 0;
+
+  border-top: 1px solid #000;
+
+  border-bottom: 1px solid #000;
+
+}
+
+
+.ack-grid {
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+}
+
+
+.ack-column {
+
+  padding: 5mm 3mm 6mm 3mm;
+
+}
+
+
+.ack-column:first-child {
+
+  border-right: 1px solid #000;
+
+}
+
+
+.ack-heading {
+
+  font-size: 10pt;
+
+  font-weight: bold;
+
+  margin-bottom: 5mm;
+
+}
+
+
+.ack-row {
+
+  display: grid;
+
+  grid-template-columns: 25mm 1fr;
+
+  margin-bottom: 4mm;
+
+  min-height: 6mm;
+
+}
+
+
+.ack-label {
+
+  font-size: 9pt;
+
+  font-weight: bold;
+
+}
+
+
+.ack-value {
+
+  font-size: 9pt;
+
+  font-weight: bold;
+
+  border-bottom: 1px solid #000;
+
+  min-height: 5mm;
+
+  padding-left: 2mm;
+
+}
+
+
+/* =================================================
+   PRINT
+   ================================================= */
+
+@media print {
+
+  body {
+
+    background: white;
+
+  }
+
+
+  .print-toolbar {
+
+    display: none !important;
+
+  }
+
+
+  .ear-page {
+
+    width: 190mm;
+
+    min-height: 277mm;
+
+    margin: 0 auto;
+
+    padding: 3mm;
+
+  }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- ==========================================
+     SCREEN BUTTONS
+     ========================================== -->
+
+<div class="print-toolbar">
+
+  <button
+    class="print-button"
+    onclick="window.print()">
+
+    🖨 Print EAR
+
+  </button>
+
+
+  <button
+    class="close-button"
+    onclick="window.close()">
+
+    ✕ Close
+
+  </button>
+
+</div>
+
+
+<!-- ==========================================
+     EAR
+     ========================================== -->
+
+<div class="ear-page">
+
+
+  <!-- DATE -->
+
+  <div class="top-date">
+
+    <span class="top-date-label">
+      Date Issued:
+    </span>
+
+    <span>
+      ${issuedDate}
+    </span>
+
+  </div>
+
+
+  <!-- LOGO -->
+
+  <div class="logo-area">
+
+    <img
+      class="logo"
+      src="${logoData}"
+      alt="DIPH Logo">
+
+  </div>
+
+
+  <!-- TITLE -->
+
+  <div class="ear-title">
+
+    EQUIPMENT ACKNOWLEDGEMENT RECEIPT
+
+  </div>
+
+
+  <!-- MAIN BORDER -->
+
+  <div class="ear-border">
+
+
+    <!-- ======================================
+         EQUIPMENT DETAILS
+         ====================================== -->
+
+    <div class="section-title">
+
+      EQUIPMENT DETAILS
+
+    </div>
+
+
+    <div class="equipment-row">
+
+      <div class="equipment-label">
+        EQUIPMENT NAME
+      </div>
+
+      <div class="equipment-value">
+        ${equipmentName}
+      </div>
+
+    </div>
+
+
+    <div class="equipment-row">
+
+      <div class="equipment-label">
+        BRAND/MODEL:
+      </div>
+
+      <div class="equipment-value">
+
+        ${brand}
+        /
+        ${model}
+
+      </div>
+
+    </div>
+
+
+    <div class="equipment-row">
+
+      <div class="equipment-label">
+        SERIAL NUMBER:
+      </div>
+
+      <div class="equipment-value">
+
+        ${serialNumber}
+        /
+        ${assetId}
+
+      </div>
+
+    </div>
+
+
+    <div class="equipment-row">
+
+      <div class="equipment-label">
+        CONDITION: (NEW/USED)
+      </div>
+
+      <div class="equipment-value">
+
+        ${condition}
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================
+         TERMS
+         ====================================== -->
+
+    <div class="terms">
+
+
+      <div class="terms-title">
+
+        Terms &amp; Conditions:
+
+      </div>
+
+
+      <p>
+        I acknowledged that the above equipment is the property of the company.
+      </p>
+
+
+      <p>
+        I agree to take reasonable care of the equipment while it is in my possession
+      </p>
+
+
+      <p>
+        I understand that if the equipment is lost, stolen or damaged due to negligence
+        or misuse, I may be responsible for the repair cost or replacement, which will be based on the
+        current depreciated value ( AGE/CONDITION ) of the equipment.
+      </p>
+
+
+      <p>
+        I agree to return the equipment in good working condition upon request
+        ( e.g. , for work from home setup, reassignment, or inventory checks), upon the termination of my employment.
+      </p>
+
+
+      <p>
+        I understand that failure to return the equipment or returning it in damaged condition may
+        result in a deduction from my final paycheck or other recovery actions, in accordance
+        with labor laws.
+      </p>
+
+
+    </div>
+
+
+    <!-- ======================================
+         ACKNOWLEDGEMENTS
+         ====================================== -->
+
+    <div class="ack-title">
+
+      ACKNOWLEDGMENTS
+
+    </div>
+
+
+    <div class="ack-grid">
+
+
+      <!-- RECEIVED BY -->
+
+      <div class="ack-column">
+
+
+        <div class="ack-heading">
+
+          RECEIVED BY:
+
+        </div>
+
+
+        <div class="ack-row">
+
+          <div class="ack-label">
+            NAME:
+          </div>
+
+          <div class="ack-value">
+
+            ${receivedName}
+
+          </div>
+
+        </div>
+
+
+        <div class="ack-row">
+
+          <div class="ack-label">
+            POSITION:
+          </div>
+
+          <div class="ack-value">
+
+            ${receivedPosition}
+
+          </div>
+
+        </div>
+
+
+        <div class="ack-row">
+
+          <div class="ack-label">
+            DATE:
+          </div>
+
+          <div class="ack-value">
+
+            ${receivedDate}
+
+          </div>
+
+        </div>
+
+
+      </div>
+
+
+      <!-- ISSUED BY -->
+
+      <div class="ack-column">
+
+
+        <div class="ack-heading">
+
+          ISSUED BY:
+
+        </div>
+
+
+        <div class="ack-row">
+
+          <div class="ack-label">
+            NAME:
+          </div>
+
+          <div class="ack-value">
+
+            ${issuedBy}
+
+          </div>
+
+        </div>
+
+
+        <div class="ack-row">
+
+          <div class="ack-label">
+            POSITION:
+          </div>
+
+          <div class="ack-value">
+
+            ${issuedByPosition}
+
+          </div>
+
+        </div>
+
+
+        <div class="ack-row">
+
+          <div class="ack-label">
+            DATE:
+          </div>
+
+          <div class="ack-value">
+
+            ${issuedDate}
+
+          </div>
+
+        </div>
+
+
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+</div>
+
+
+</body>
+
+</html>
+
+  `);
+
+  printWindow.document.close();
+
+
+  // Wait for logo and layout to render
+
+  setTimeout(function() {
+
+    try {
+
+      printWindow.focus();
+
+    } catch (e) {
+
+      console.warn(e);
+
+    }
+
+  }, 500);
+
+}
+
+
+/* ==================================================
+   DATE FORMATTER
+   ================================================== */
+
+function formatEARDate(dateValue) {
+
+  if (!dateValue) {
+
+    return "";
+
+  }
+
+
+  const date =
+    new Date(dateValue);
+
+
+  if (isNaN(date.getTime())) {
+
+    return String(dateValue);
+
+  }
+
+
+  const month =
+    String(
+      date.getMonth() + 1
+    ).padStart(2, "0");
+
+
+  const day =
+    String(
+      date.getDate()
+    ).padStart(2, "0");
+
+
+  const year =
+    date.getFullYear();
+
+
+  return (
+    month +
+    "-" +
+    day +
+    "-" +
+    year
+  );
+
+}
+
+
+/* =========================================================
+   EAR PREVIEW
+   ========================================================= */
+
+function showEARPreview(
+  earData,
+  logoData,
+  previewWindow
+) {
+
+  if (!previewWindow) {
+
+    alert(
+      "Unable to open EAR preview."
+    );
+
+    return;
+  }
+
+
+  // ==================================================
+  // HELPER
+  // ==================================================
+
+  function escapeHTML(value) {
+
+    if (
+      value === null ||
+      value === undefined
+    ) {
+
+      return "";
+
+    }
+
+    return String(value)
+
+      .replace(/&/g, "&amp;")
+
+      .replace(/</g, "&lt;")
+
+      .replace(/>/g, "&gt;")
+
+      .replace(/"/g, "&quot;")
+
+      .replace(/'/g, "&#039;");
+
+  }
+
+
+  // ==================================================
+  // DATE
+  // ==================================================
+
+  function formatDate(value) {
+
+    if (!value) {
+      return "";
+    }
+
+    const date =
+      new Date(value);
+
+    if (isNaN(date.getTime())) {
+      return String(value);
+    }
+
+    const month =
+      String(
+        date.getMonth() + 1
+      ).padStart(2, "0");
+
+    const day =
+      String(
+        date.getDate()
+      ).padStart(2, "0");
+
+    const year =
+      date.getFullYear();
+
+    return (
+      month +
+      "-" +
+      day +
+      "-" +
+      year
+    );
+
+  }
+
+
+  // ==================================================
+  // LOGO
+  // ==================================================
+
+  let logoURL = "";
+
+  if (
+    logoData &&
+    logoData.dataUrl
+  ) {
+
+    logoURL =
+      logoData.dataUrl;
+
+  }
+
+
+  // ==================================================
+  // DATA
+  // ==================================================
+
+  const equipmentName =
+    escapeHTML(
+      earData.equipmentName || "Headset"
+    );
+
+  const assetId =
+    escapeHTML(
+      earData.assetId || ""
+    );
+
+  const brand =
+    escapeHTML(
+      earData.brand || ""
+    );
+
+  const model =
+    escapeHTML(
+      earData.model || ""
+    );
+
+  const serialNumber =
+    escapeHTML(
+      earData.serialNumber || ""
+    );
+
+  const condition =
+    escapeHTML(
+      earData.condition || ""
+    );
+
+  const receivedName =
+    escapeHTML(
+      earData.receivedName || ""
+    );
+
+  const issuedBy =
+    escapeHTML(
+      earData.issuedBy || ""
+    );
+
+  const receivedDate =
+    formatDate(
+      earData.receivedDate
+    );
+
+  const issuedDate =
+    formatDate(
+      earData.issuedDate
+    );
+
+
+  // ==================================================
+  // BUILD EAR
+  // ==================================================
+
+  previewWindow.document.open();
+
+  previewWindow.document.write(`
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <title>
+    Equipment Acknowledgement Receipt - ${assetId}
+  </title>
+
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+
+    html,
+    body {
+
+      margin: 0;
+      padding: 0;
+
+      background: #e5e7eb;
+
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+      color: #000;
+
+    }
+
+
+    /* ==========================================
+       PREVIEW CONTROLS
+       ========================================== */
+
+    .ear-controls {
+
+      width: 210mm;
+
+      margin:
+        20px auto;
+
+      display: flex;
+
+      justify-content: flex-end;
+
+      gap: 10px;
+
+    }
+
+
+    .ear-controls button {
+
+      border: none;
+
+      padding:
+        10px 18px;
+
+      border-radius: 6px;
+
+      font-size: 14px;
+
+      font-weight: 600;
+
+      cursor: pointer;
+
+    }
+
+
+    .print-btn {
+
+      background: #2563eb;
+
+      color: white;
+
+    }
+
+
+    .close-btn {
+
+      background: #6b7280;
+
+      color: white;
+
+    }
+
+
+    /* ==========================================
+       A4 PAGE
+       ========================================== */
+
+    .ear-page {
+
+      width: 210mm;
+
+      min-height: 297mm;
+
+      margin: 0 auto 20px;
+
+      background: white;
+
+      padding:
+        8mm 8mm 7mm;
+
+      box-shadow:
+        0 4px 20px
+        rgba(0,0,0,.18);
+
+    }
+
+
+    /* ==========================================
+       HEADER
+       ========================================== */
+
+    .ear-header {
+
+      position: relative;
+
+      text-align: center;
+
+      height: 30mm;
+
+    }
+
+
+    .ear-logo {
+
+      width: 42mm;
+
+      max-height: 20mm;
+
+      object-fit: contain;
+
+      margin-top: 1mm;
+
+    }
+
+
+    .date-issued-top {
+
+      position: absolute;
+
+      top: 0;
+
+      right: 0;
+
+      font-size: 8px;
+
+      font-weight: bold;
+
+    }
+
+
+    .ear-title {
+
+      margin-top: 1mm;
+
+      font-size: 13px;
+
+      font-weight: bold;
+
+      letter-spacing: .2px;
+
+    }
+
+
+    /* ==========================================
+       SECTION TITLE
+       ========================================== */
+
+    .section-title {
+
+      border:
+        1px solid #000;
+
+      border-bottom: none;
+
+      text-align: center;
+
+      font-size: 9px;
+
+      font-weight: bold;
+
+      padding: 3px 0;
+
+      height: 6mm;
+
+    }
+
+
+    /* ==========================================
+       EQUIPMENT DETAILS
+       ========================================== */
+
+    table {
+
+      width: 100%;
+
+      border-collapse: collapse;
+
+    }
+
+
+    .equipment-table {
+
+      font-size: 8px;
+
+    }
+
+
+    .equipment-table td {
+
+      border:
+        1px solid #000;
+
+      padding:
+        2px 4px;
+
+      height: 5.8mm;
+
+    }
+
+
+    .equipment-table td:first-child {
+
+      width: 31%;
+
+      font-weight: bold;
+
+    }
+
+
+    .equipment-table td:last-child {
+
+      width: 69%;
+
+      text-align: center;
+
+    }
+
+
+    /* ==========================================
+       TERMS
+       ========================================== */
+
+    .terms-box {
+
+      border:
+        1px solid #000;
+
+      border-top: none;
+
+      padding:
+        5px 6px;
+
+      height: 92mm;
+
+      font-size: 8px;
+
+      line-height: 1.25;
+
+    }
+
+
+    .terms-title {
+
+      font-weight: bold;
+
+      margin-bottom: 13px;
+
+    }
+
+
+    .terms-box p {
+
+      margin:
+        0 0 9px;
+
+    }
+
+
+    /* ==========================================
+       ACKNOWLEDGEMENT
+       ========================================== */
+
+    .ack-title {
+
+      border:
+        1px solid #000;
+
+      border-bottom: none;
+
+      text-align: center;
+
+      font-size: 8px;
+
+      font-weight: bold;
+
+      padding: 3px 0;
+
+      height: 6mm;
+
+    }
+
+
+    .ack-table {
+
+      border:
+        1px solid #000;
+
+      font-size: 8px;
+
+      table-layout: fixed;
+
+    }
+
+
+    .ack-table td {
+
+      width: 50%;
+
+      vertical-align: top;
+
+      padding:
+        5px 5px 3px;
+
+      border-right:
+        1px solid #000;
+
+    }
+
+
+    .ack-table td:last-child {
+
+      border-right: none;
+
+    }
+
+
+    .ack-heading {
+
+      font-weight: bold;
+
+      font-size: 8px;
+
+      margin-bottom: 9px;
+
+    }
+
+
+    .ack-row {
+
+      display: flex;
+
+      align-items: baseline;
+
+      margin-bottom: 8px;
+
+      min-height: 13px;
+
+    }
+
+
+    .ack-label {
+
+      width: 42px;
+
+      font-weight: bold;
+
+      font-size: 7px;
+
+    }
+
+
+    .ack-value {
+
+      flex: 1;
+
+      border-bottom:
+        1px solid #000;
+
+      min-height: 12px;
+
+      padding-left: 4px;
+
+      font-size: 8px;
+
+    }
+
+
+    /* ==========================================
+       PRINT
+       ========================================== */
+
+    @page {
+
+      size: A4 portrait;
+
+      margin: 0;
+
+    }
+
+
+    @media print {
+
+      html,
+      body {
+
+        width: 210mm;
+
+        height: 297mm;
+
+        background: white;
+
+      }
+
+
+      .ear-controls {
+
+        display: none !important;
+
+      }
+
+
+      .ear-page {
+
+        margin: 0;
+
+        width: 210mm;
+
+        min-height: 297mm;
+
+        box-shadow: none;
+
+        page-break-after: avoid;
+
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+  <!-- ========================================
+       PRINT / CLOSE CONTROLS
+       ======================================== -->
+
+  <div class="ear-controls">
+
+    <button
+      class="print-btn"
+      onclick="window.print()">
+
+      🖨 Print EAR
+
+    </button>
+
+
+    <button
+      class="close-btn"
+      onclick="window.close()">
+
+      Close
+
+    </button>
+
+  </div>
+
+
+  <!-- ========================================
+       EAR PAGE
+       ======================================== -->
+
+  <div class="ear-page">
+
+
+    <!-- HEADER -->
+
+    <div class="ear-header">
+
+      <div class="date-issued-top">
+
+        Date Issued:
+
+        ${escapeHTML(issuedDate)}
+
+      </div>
+
+
+      ${
+        logoURL
+          ? `
+            <img
+              class="ear-logo"
+              src="${logoURL}"
+              alt="DIPH Logo">
+          `
+          : ""
+      }
+
+
+      <div class="ear-title">
+
+        EQUIPMENT ACKNOWLEDGEMENT RECEIPT
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================
+         EQUIPMENT DETAILS
+         ====================================== -->
+
+    <div class="section-title">
+
+      EQUIPMENT DETAILS
+
+    </div>
+
+
+    <table class="equipment-table">
+
+      <tr>
+
+        <td>
+          EQUIPMENT NAME
+        </td>
+
+        <td>
+          ${equipmentName}
+        </td>
+
+      </tr>
+
+
+      <tr>
+
+        <td>
+          BRAND/MODEL
+        </td>
+
+        <td>
+          ${brand} / ${model}
+        </td>
+
+      </tr>
+
+
+      <tr>
+
+        <td>
+          SERIAL NUMBER
+        </td>
+
+        <td>
+          ${serialNumber}
+        </td>
+
+      </tr>
+
+
+      <tr>
+
+        <td>
+          CONDITION: (NEW/USED)
+        </td>
+
+        <td>
+          ${condition}
+        </td>
+
+      </tr>
+
+    </table>
+
+
+    <!-- ======================================
+         TERMS & CONDITIONS
+         ====================================== -->
+
+    <div class="terms-box">
+
+      <div class="terms-title">
+
+        Terms & Conditions:
+
+      </div>
+
+
+      <p>
+        I acknowledge that the above equipment is the property of the company.
+      </p>
+
+
+      <p>
+        I agree to take reasonable care of the equipment while it is in my possession.
+      </p>
+
+
+      <p>
+        I understand that if the equipment is lost, stolen or damaged due to negligence or misuse,
+        I may be responsible for the repair cost or replacement, which will be based on the
+        current depreciated value (AGE/CONDITION) of the equipment.
+      </p>
+
+
+      <p>
+        I agree to return the equipment in good working condition upon request
+        (e.g. for work from home setup, reassignment, or inventory checks),
+        upon the termination of my employment.
+      </p>
+
+
+      <p>
+        I understand that failure to return the equipment or returning it in damaged condition
+        may result in a deduction from my final paycheck or other recovery actions,
+        in accordance with HR policies.
+      </p>
+
+    </div>
+
+
+    <!-- ======================================
+         ACKNOWLEDGEMENTS
+         ====================================== -->
+
+    <div class="ack-title">
+
+      ACKNOWLEDGEMENTS
+
+    </div>
+
+
+    <table class="ack-table">
+
+      <tr>
+
+
+        <!-- RECEIVED BY -->
+
+        <td>
+
+          <div class="ack-heading">
+
+            RECEIVED BY:
+
+          </div>
+
+
+          <div class="ack-row">
+
+            <div class="ack-label">
+              NAME:
+            </div>
+
+            <div class="ack-value">
+              ${receivedName}
+            </div>
+
+          </div>
+
+
+          <div class="ack-row">
+
+            <div class="ack-label">
+              POSITION:
+            </div>
+
+            <div class="ack-value">
+              
+            </div>
+
+          </div>
+
+
+          <div class="ack-row">
+
+            <div class="ack-label">
+              DATE:
+            </div>
+
+            <div class="ack-value">
+              ${receivedDate}
+            </div>
+
+          </div>
+
+        </td>
+
+
+        <!-- ISSUED BY -->
+
+        <td>
+
+          <div class="ack-heading">
+
+            ISSUED BY:
+
+          </div>
+
+
+          <div class="ack-row">
+
+            <div class="ack-label">
+              NAME:
+            </div>
+
+            <div class="ack-value">
+              ${issuedBy}
+            </div>
+
+          </div>
+
+
+          <div class="ack-row">
+
+            <div class="ack-label">
+              POSITION:
+            </div>
+
+            <div class="ack-value">
+              
+            </div>
+
+          </div>
+
+
+          <div class="ack-row">
+
+            <div class="ack-label">
+              DATE:
+            </div>
+
+            <div class="ack-value">
+              ${issuedDate}
+            </div>
+
+          </div>
+
+        </td>
+
+
+      </tr>
+
+    </table>
+
+
+  </div>
+
+
+</body>
+
+</html>
+
+  `);
+
+  previewWindow.document.close();
+
+}
+
+function formatEARDate(dateValue) {
+
+  if (!dateValue) {
+    return "-";
+  }
+
+  const date =
+    new Date(dateValue);
+
+  if (isNaN(date.getTime())) {
+    return "-";
+  }
+
+  return date.toLocaleDateString(
+    "en-US",
+    {
+      month: "long",
+      day: "numeric",
+      year: "numeric"
+    }
+  );
 
 }
 
