@@ -3427,68 +3427,181 @@ function saveHeadset() {
   btn.disabled = true;
   btn.textContent = "Saving...";
 
+
+  // =========================================
+  // GET LOGGED-IN IT USER
+  // =========================================
+
+  const currentUser = window.currentITUser || {};
+
+
+  // =========================================
+  // COLLECT HEADSET DATA
+  // =========================================
+
   const headset = {
 
     assetId: document.getElementById("assetId").value,
-    brand: document.getElementById("brand").value.trim(),
-    model: document.getElementById("model").value.trim(),
-    serialNumber: document.getElementById("serialNumber").value.trim(),
-    condition: document.getElementById("condition").value,
-    purchaseDate: document.getElementById("purchaseDate").value,
-    purchasePrice: document.getElementById("purchasePrice").value
+
+    brand:
+      document.getElementById("brand").value.trim(),
+
+    model:
+      document.getElementById("model").value.trim(),
+
+    serialNumber:
+      document.getElementById("serialNumber").value.trim(),
+
+    condition:
+      document.getElementById("condition").value,
+
+    purchaseDate:
+      document.getElementById("purchaseDate").value,
+
+    purchasePrice:
+      document.getElementById("purchasePrice").value,
+
+
+    // =======================================
+    // LOGGED-IN IT USER
+    // =======================================
+
+    currentITUser: {
+
+      username:
+        currentUser.username || "",
+
+      fullName:
+        currentUser.fullName || "",
+
+      position:
+        currentUser.position || ""
+
+    }
 
   };
 
+
+  // =========================================
+  // VALIDATION
+  // =========================================
+
   if (!headset.brand) {
+
     alert("Please enter the Brand.");
+
     btn.disabled = false;
     btn.textContent = "Save Headset";
+
     return;
   }
+
 
   if (!headset.model) {
+
     alert("Please enter the Model.");
+
     btn.disabled = false;
     btn.textContent = "Save Headset";
+
     return;
   }
+
 
   if (!headset.serialNumber) {
+
     alert("Please enter the Serial Number.");
+
     btn.disabled = false;
     btn.textContent = "Save Headset";
+
     return;
   }
 
+
+  // =========================================
+  // SAVE TO GOOGLE APPS SCRIPT
+  // =========================================
+
   google.script.run
+
     .withSuccessHandler(function() {
 
+
+      // =======================================
+      // CLEAR FORM
+      // =======================================
+
       document.getElementById("brand").value = "";
+
       document.getElementById("model").value = "";
+
       document.getElementById("serialNumber").value = "";
+
       document.getElementById("purchaseDate").value = "";
+
       document.getElementById("purchasePrice").value = "";
+
+
+      // =======================================
+      // CLOSE MODAL
+      // =======================================
 
       closeAddHeadsetModal();
 
+
+      // =======================================
+      // REFRESH INVENTORY
+      // =======================================
+
       loadInventoryData();
+
+
+      // =======================================
+      // REFRESH DASHBOARD
+      // =======================================
+
       loadDashboardStats();
 
+
+      // =======================================
+      // RESTORE BUTTON
+      // =======================================
+
       btn.disabled = false;
+
       btn.textContent = "Save Headset";
+
+
+      // =======================================
+      // SUCCESS MESSAGE
+      // =======================================
 
       alert("Headset added successfully!");
 
     })
+
+
     .withFailureHandler(function(error) {
 
+
       btn.disabled = false;
+
       btn.textContent = "Save Headset";
 
+
       console.error(error);
-      alert("Error: " + error.message);
+
+      alert(
+        "Error: " +
+        (error && error.message
+          ? error.message
+          : error)
+      );
 
     })
+
+
     .saveHeadset(headset);
 
 }
@@ -3553,62 +3666,117 @@ function issueHeadset() {
   btn.disabled = true;
   btn.textContent = "Issuing...";
 
+
+  // =========================================
+  // GET LOGGED-IN IT USER
+  // =========================================
+
+  const currentUser = window.currentITUser || {};
+
+  const loggedInIT =
+    currentUser.fullName ||
+    currentUser.username ||
+    "";
+
+
+  // =========================================
+  // GET ISSUE DATA
+  // =========================================
+
   const issue = {
 
-    agentName: document.getElementById("issueAgentName").value.trim(),
-    assetId: document.getElementById("issueAssetId").value,
-    issuedBy: document.getElementById("issuedBy").value.trim()
+    agentName:
+      document.getElementById("issueAgentName").value.trim(),
+
+    assetId:
+      document.getElementById("issueAssetId").value,
+
+    // Automatically use logged-in IT user
+    issuedBy:
+      loggedInIT,
+
+    currentITUser: currentUser
 
   };
 
+
+  // =========================================
+  // VALIDATION
+  // =========================================
+
   if (!issue.agentName) {
+
     alert("Please enter the Agent Name.");
+
     btn.disabled = false;
     btn.textContent = "Issue Headset";
+
     return;
   }
+
 
   if (!issue.assetId) {
+
     alert("Please select an Asset ID.");
+
     btn.disabled = false;
     btn.textContent = "Issue Headset";
+
     return;
   }
 
-  if (!issue.issuedBy) {
-    alert("Please enter who issued the headset.");
-    btn.disabled = false;
-    btn.textContent = "Issue Headset";
-    return;
-  }
+
+  // =========================================
+  // SAVE ISSUE
+  // =========================================
 
   google.script.run
+
     .withSuccessHandler(function() {
 
       document.getElementById("issueAgentName").value = "";
+
       document.getElementById("issueAssetId").selectedIndex = 0;
-      document.getElementById("issuedBy").value = "";
+
 
       closeIssueHeadsetModal();
 
+
       loadInventoryData();
+
       loadDashboardStats();
+
 
       btn.disabled = false;
       btn.textContent = "Issue Headset";
 
-      alert("Headset issued successfully!");
+
+      alert(
+        "Headset issued successfully by " +
+        issue.issuedBy +
+        "!"
+      );
 
     })
+
+
     .withFailureHandler(function(error) {
 
       btn.disabled = false;
       btn.textContent = "Issue Headset";
 
       console.error(error);
-      alert("Error: " + error.message);
+
+      alert(
+        "Error: " +
+        (error && error.message
+          ? error.message
+          : error)
+      );
 
     })
+
+
     .issueHeadset(issue);
 
 }
@@ -3774,38 +3942,40 @@ function closeBorrowHeadsetModal() {
 
 function saveBorrowHeadset() {
 
-  const agentName =
-    document.getElementById(
-      "borrowAgentName"
-    ).value.trim();
+  // =========================================
+  // GET FORM VALUES
+  // =========================================
 
+  const agentName =
+    document.getElementById("borrowAgentName").value.trim();
 
   const assetId =
-    document.getElementById(
-      "borrowAssetId"
-    ).value;
-
+    document.getElementById("borrowAssetId").value;
 
   const brand =
-    document.getElementById(
-      "borrowHeadsetBrand"
-    ).value;
+    document.getElementById("borrowHeadsetBrand").value;
 
+
+  // =========================================
+  // GET LOGGED-IN IT USER
+  // =========================================
+
+  const currentUser =
+    window.currentITUser || {};
 
   const issuedBy =
-    document.getElementById(
-      "borrowIssuedBy"
-    ).value.trim();
+    currentUser.fullName || "";
 
 
-  // Validation
+  // =========================================
+  // VALIDATION
+  // =========================================
 
   if (!agentName) {
 
     alert("Please enter the Agent Name.");
 
     return;
-
   }
 
 
@@ -3814,58 +3984,104 @@ function saveBorrowHeadset() {
     alert("Please select an Asset ID.");
 
     return;
-
   }
 
 
   if (!issuedBy) {
 
-    alert("Please enter the IT staff name.");
+    alert(
+      "No IT user is currently logged in. Please log in again."
+    );
 
     return;
+  }
+
+
+  // =========================================
+  // SHOW LOGGED-IN USER
+  // =========================================
+
+  const issuedByInput =
+    document.getElementById("borrowIssuedBy");
+
+  if (issuedByInput) {
+
+    issuedByInput.value = issuedBy;
 
   }
 
 
+  // =========================================
+  // BUTTON
+  // =========================================
+
   const button =
-    document.getElementById(
-      "btnSaveBorrowHeadset"
-    );
+    document.getElementById("btnSaveBorrowHeadset");
+
+  if (button) {
+
+    button.disabled = true;
+
+    button.innerHTML = `
+      <span class="material-icons-outlined">
+        hourglass_top
+      </span>
+      Saving...
+    `;
+
+  }
 
 
-  button.disabled = true;
-
-  button.innerHTML = `
-    <span class="material-icons-outlined">
-      hourglass_top
-    </span>
-    Saving...
-  `;
-
+  // =========================================
+  // PREPARE DATA
+  // =========================================
 
   const data = {
 
-    agentName: agentName,
-    assetId: assetId,
-    brand: brand,
-    issuedBy: issuedBy
+    agentName:
+      agentName,
+
+    assetId:
+      assetId,
+
+    brand:
+      brand,
+
+    issuedBy:
+      issuedBy,
+
+    currentITUser:
+      currentUser
 
   };
 
+
+  // =========================================
+  // SAVE TO GOOGLE APPS SCRIPT
+  // =========================================
 
   google.script.run
 
     .withSuccessHandler(function(result) {
 
-      button.disabled = false;
 
-      button.innerHTML = `
-        <span class="material-icons-outlined">
-          save
-        </span>
-        Save Borrow
-      `;
+      // Restore button
 
+      if (button) {
+
+        button.disabled = false;
+
+        button.innerHTML = `
+          <span class="material-icons-outlined">
+            save
+          </span>
+          Save Borrow
+        `;
+
+      }
+
+
+      // Check result
 
       if (!result || !result.success) {
 
@@ -3878,29 +4094,49 @@ function saveBorrowHeadset() {
       }
 
 
+      // =======================================
+      // SUCCESS
+      // =======================================
+
       alert(
         "Headset borrowed successfully."
       );
 
 
+      // Close modal
+
       closeBorrowHeadsetModal();
 
 
-      // Refresh Inventory
+      // =======================================
+      // REFRESH INVENTORY
+      // =======================================
 
-      if (typeof loadInventoryData === "function") {
+      if (
+        typeof loadInventoryData === "function"
+      ) {
+
         loadInventoryData();
+
       }
 
 
-      // Refresh Dashboard statistics
+      // =======================================
+      // REFRESH DASHBOARD
+      // =======================================
 
-      if (typeof loadDashboardStats === "function") {
+      if (
+        typeof loadDashboardStats === "function"
+      ) {
+
         loadDashboardStats();
+
       }
 
 
-      // Refresh Recent Transactions
+      // =======================================
+      // REFRESH RECENT TRANSACTIONS
+      // =======================================
 
       if (
         typeof loadRecentTransactions === "function"
@@ -3912,6 +4148,11 @@ function saveBorrowHeadset() {
 
     })
 
+
+    // =========================================
+    // SERVER ERROR
+    // =========================================
+
     .withFailureHandler(function(error) {
 
       console.error(
@@ -3920,14 +4161,18 @@ function saveBorrowHeadset() {
       );
 
 
-      button.disabled = false;
+      if (button) {
 
-      button.innerHTML = `
-        <span class="material-icons-outlined">
-          save
-        </span>
-        Save Borrow
-      `;
+        button.disabled = false;
+
+        button.innerHTML = `
+          <span class="material-icons-outlined">
+            save
+          </span>
+          Save Borrow
+        `;
+
+      }
 
 
       alert(
@@ -3936,6 +4181,11 @@ function saveBorrowHeadset() {
       );
 
     })
+
+
+    // =========================================
+    // CALL BACKEND
+    // =========================================
 
     .borrowHeadset(data);
 

@@ -3,17 +3,69 @@ function saveHeadset(headset) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet()
     .getSheetByName(CONFIG.SHEETS.INVENTORY);
 
-  const row = getFirstEmptyRow(sheet, 2); // Column B
+
+  // =========================================
+  // FIND NEXT EMPTY INVENTORY ROW
+  // =========================================
+
+  const row = getFirstEmptyRow(sheet, 2);
+
+
+  // =========================================
+  // SAVE HEADSET
+  // =========================================
 
   sheet.getRange(row, 2).setValue(headset.assetId);          // B - Asset ID
   sheet.getRange(row, 3).setValue(headset.brand);            // C - Brand
   sheet.getRange(row, 4).setValue(headset.model);            // D - Model
   sheet.getRange(row, 5).setValue(headset.serialNumber);     // E - Serial Number
-  sheet.getRange(row, 7).setValue(headset.condition);        // G - Condition
+  sheet.getRange(row, 7).setValue(headset.condition);         // G - Condition
   sheet.getRange(row, 12).setValue(headset.purchaseDate);    // L - Purchase Date
   sheet.getRange(row, 13).setValue(headset.purchasePrice);   // M - Purchase Price
 
+
   SpreadsheetApp.flush();
+
+
+  // =========================================
+  // ACTIVITY LOG
+  // =========================================
+  //
+  // IMPORTANT:
+  // The frontend can send the logged-in IT
+  // user inside headset.currentITUser.
+  //
+
+  const user = headset.currentITUser || {};
+
+
+  saveActivityLog({
+
+    user: {
+      username: user.username || "",
+      fullName: user.fullName || "",
+      position: user.position || ""
+    },
+
+    action: "ADDED HEADSET",
+
+    assetId: headset.assetId || "",
+
+    employee: "",
+
+    description:
+      "Added " +
+      (headset.brand || "") +
+      " " +
+      (headset.model || "") +
+      " to inventory."
+
+  });
+
+
+  // =========================================
+  // SUCCESS
+  // =========================================
 
   return true;
 

@@ -104,75 +104,83 @@ function borrowHeadset(data) {
   }
 
 
+  // =========================================
+  // GET BORROW LOGS SHEET
+  // =========================================
+
   const sheet = SpreadsheetApp
     .getActiveSpreadsheet()
     .getSheetByName(CONFIG.SHEETS.BORROW);
+
 
   if (!sheet) {
     throw new Error("Borrow Logs sheet not found.");
   }
 
 
-  /*
-   * Data starts at Row 2.
-   *
-   * Find the next available row based
-   * on Column B.
-   */
-  const row = getFirstEmptyRow(sheet, 2);
+  // =========================================
+  // GET LOGGED-IN IT USER
+  // =========================================
+
+  const currentUser =
+    data.currentITUser || {};
+
+  const itUsername =
+    currentUser.username || "";
+
+  const itFullName =
+    currentUser.fullName ||
+    data.issuedBy ||
+    "Unknown IT Staff";
+
+  const itPosition =
+    currentUser.position ||
+    "IT Staff";
 
 
-  /*
-   * B - Date
-   */
+  // =========================================
+  // FIND NEXT ROW
+  // =========================================
+
+  const row =
+    getFirstEmptyRow(sheet, 2);
+
+
+  // =========================================
+  // SAVE BORROW TRANSACTION
+  // =========================================
+
+  // B - Date
   sheet
     .getRange(row, 2)
     .setValue(new Date());
 
 
-  /*
-   * C - Agent Name
-   */
+  // C - Agent Name
   sheet
     .getRange(row, 3)
     .setValue(data.agentName);
 
 
-  /*
-   * D - Asset ID
-   */
+  // D - Asset ID
   sheet
     .getRange(row, 4)
     .setValue(data.assetId);
 
 
-  /*
-   * E - Headset Brand
-   */
+  // E - Headset Brand
   sheet
     .getRange(row, 5)
     .setValue(data.brand);
 
 
-  /*
-   * F - Issued By
-   *
-   * For now we accept the value from
-   * the form.
-   *
-   * Later we will replace this with
-   * the logged-in IT user automatically.
-   */
+  // F - Issued By
   sheet
     .getRange(row, 6)
-    .setValue(data.issuedBy || "");
+    .setValue(itFullName);
 
 
-  /*
-   * G - Status
-   *
-   * Automatically set to Borrowed.
-   */
+  // G - Status
   sheet
     .getRange(row, 7)
     .setValue("Borrowed");
@@ -181,9 +189,49 @@ function borrowHeadset(data) {
   SpreadsheetApp.flush();
 
 
+  // =========================================
+  // ACTIVITY LOG
+  // =========================================
+
+  logActivity({
+
+    itUsername:
+      itUsername,
+
+    itFullName:
+      itFullName,
+
+    itPosition:
+      itPosition,
+
+    action:
+      "BORROWED HEADSET",
+
+    assetId:
+      data.assetId,
+
+    employee:
+      data.agentName,
+
+    description:
+      "Borrowed headset " +
+      data.assetId +
+      " by " +
+      data.agentName
+
+  });
+
+
+  // =========================================
+  // RETURN RESULT
+  // =========================================
+
   return {
+
     success: true,
+
     row: row
+
   };
 
 }
