@@ -11,86 +11,349 @@ body{
     background:#f4f6f9;
 }
 
-#app-layout{
-    display:flex;
-    min-height:100vh;
+#app-layout {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  align-items: stretch;
 }
 
-.login-container{
+.login-container {
+    min-height: 100vh;
+    width: 100%;
 
-    height:100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    display:flex;
+    padding: 40px 20px;
 
-    justify-content:center;
+    box-sizing: border-box;
 
-    align-items:center;
-
+    background: #f5f7fb;
 }
 
-.login-card{
+/* =========================================
+   LOGIN CARD
+   ========================================= */
 
-    width:350px;
+.login-card {
+    width: 100%;
+    max-width: 430px;
 
-    background:white;
+    padding: 42px 40px 38px;
 
-    padding:30px;
+    background: #ffffff;
 
-    border-radius:12px;
+    border: 1px solid #e5e7eb;
 
-    box-shadow:0 10px 25px rgba(0,0,0,.1);
+    border-radius: 18px;
 
+    box-shadow:
+        0 20px 45px rgba(15, 23, 42, 0.10);
+
+    box-sizing: border-box;
 }
 
-.login-card h1{
+/* =========================================
+   LOGIN ICON
+   ========================================= */
 
-    margin-bottom:10px;
+.login-icon {
+    width: 64px;
+    height: 64px;
 
+    margin: 0 auto 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 16px;
+
+    background: #eff6ff;
 }
 
-.login-card p{
-
-    margin-bottom:20px;
-
-    color:#777;
-
+.login-icon .material-icons-outlined {
+    font-size: 34px;
+    color: #2563eb;
 }
 
-.login-card input{
 
-    width:100%;
+/* =========================================
+   LOGIN TITLE
+   ========================================= */
 
-    padding:12px;
+.login-card h1 {
+    margin: 0;
 
-    margin-bottom:15px;
+    text-align: center;
 
+    font-size: 24px;
+    line-height: 1.3;
+
+    font-weight: 700;
+
+    color: #111827;
 }
 
-.login-card button{
+.login-subtitle {
+    margin: 8px 0 32px;
 
-    width:100%;
+    text-align: center;
 
-    padding:12px;
+    font-size: 14px;
 
-    border:none;
-
-    background:#1565C0;
-
-    color:white;
-
-    border-radius:6px;
-
+    color: #6b7280;
 }
 
-.main-content{
-  flex:1;
-  display:flex;
-  flex-direction:column;
+.login-card p {
+    margin: 0 0 30px;
+
+    color: #6b7280;
+
+    font-size: 14px;
+
+    text-align: center;
+}
+
+/* =========================================
+   LOGIN FORM
+   ========================================= */
+
+.login-form {
+    width: 100%;
+}
+
+.login-field {
+    margin-bottom: 20px;
+}
+
+.login-field label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: #374151;
+}
+
+/* =========================================
+   INPUT WRAPPER
+   ========================================= */
+
+.input-wrapper {
+    position: relative;
+    width: 100%;
+    height: 48px;
+}
+
+.input-wrapper .material-icons-outlined {
+    position: absolute;
+
+    left: 14px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    font-size: 20px;
+    line-height: 1;
+
+    color: #9ca3af;
+
+    pointer-events: none;
+
+    z-index: 2;
+}
+
+/* =========================================
+   INPUT
+   ========================================= */
+
+.input-wrapper input {
+    width: 100%;
+    height: 48px;
+
+    padding: 0 14px 0 44px !important;
+
+    box-sizing: border-box;
+
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    color: #111827;
+
+    font-size: 14px;
+
+    outline: none;
+}
+
+
+.input-wrapper input::placeholder {
+    color: #9ca3af;
+}
+
+
+.input-wrapper input:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+#itLoginButton {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.login-card input {
+    width: 100%;
+    height: 46px;
+
+    padding: 0 14px;
+
+    margin-bottom: 16px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    box-sizing: border-box;
+
+    outline: none;
+
+    transition: 0.2s;
+}
+
+.login-card input:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* =========================================
+   LOGIN BUTTON
+   ========================================= */
+
+.login-button {
+    width: 100%;
+    height: 48px;
+
+    margin-top: 4px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.1s ease;
+}
+
+.login-button:hover {
+    background: #1d4ed8;
+}
+
+.login-button:active {
+    transform: translateY(1px);
+}
+
+.login-button .material-icons-outlined {
+    font-size: 19px;
+}
+
+/* =========================================
+   BACK TO DASHBOARD
+   ========================================= */
+
+.back-dashboard-button {
+    width: 100%;
+    height: 44px;
+
+    margin-top: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    color: #4b5563;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.back-dashboard-button:hover {
+    background: #f9fafb;
+
+    border-color: #d1d5db;
+
+    color: #111827;
+}
+
+
+.back-dashboard-button .material-icons-outlined {
+    font-size: 18px;
+}
+
+.main-content {
+  flex: 1 1 auto;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  min-height: 100vh;
 }
 
 .sidebar{
   width:250px;
-  min-height:100vh;
+  height:100vh;          /* was: min-height:100vh */
+  position:sticky;
+  top:0;
+  align-self:flex-start; /* needed for sticky to work inside the flex row */
+  overflow-y:auto;
   background:#1E293B;
   color:#fff;
   padding:20px;
@@ -199,6 +462,263 @@ body{
   border-radius:8px;
   background:#F8FAFC;
   font-weight:500;
+}
+
+/* =========================================
+   USER PROFILE
+   ========================================= */
+
+.user-profile-wrapper {
+  position: relative;
+}
+
+
+/* Profile button */
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 7px 10px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #f8fafc;
+
+  color: #374151;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+
+  text-align: left;
+}
+
+.user-profile:hover {
+  background: #f1f5f9;
+}
+
+
+.user-profile > .material-icons-outlined:first-child {
+  font-size: 32px;
+  color: #2563eb;
+}
+
+
+/* User name + position */
+
+.user-profile-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.2;
+}
+
+.user-profile-info span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.user-profile-info small {
+  margin-top: 3px;
+
+  font-size: 11px;
+  font-weight: 400;
+
+  color: #6b7280;
+}
+
+
+/* Dropdown arrow */
+
+.user-dropdown-icon {
+  font-size: 19px !important;
+  color: #64748b;
+
+  transition: transform 0.2s ease;
+}
+
+
+/* =========================================
+   PROFILE DROPDOWN
+   ========================================= */
+
+.user-profile-menu {
+
+  position: absolute;
+
+  top: calc(100% + 10px);
+  right: 0;
+
+  width: 250px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 12px;
+
+  box-shadow:
+    0 15px 35px rgba(15, 23, 42, 0.15);
+
+  overflow: hidden;
+
+  z-index: 9999;
+
+  display: none;
+
+  animation: profileMenuOpen 0.15s ease-out;
+}
+
+
+.user-profile-menu.show {
+  display: block;
+}
+
+
+@keyframes profileMenuOpen {
+
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+}
+
+
+/* =========================================
+   PROFILE HEADER
+   ========================================= */
+
+.profile-menu-header {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 16px;
+}
+
+
+.profile-menu-header > .material-icons-outlined {
+
+  font-size: 38px;
+
+  color: #2563eb;
+}
+
+
+.profile-menu-header div {
+
+  display: flex;
+
+  flex-direction: column;
+
+  min-width: 0;
+}
+
+
+.profile-menu-header strong {
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  color: #111827;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+
+.profile-menu-header small {
+
+  margin-top: 3px;
+
+  font-size: 11px;
+
+  color: #6b7280;
+}
+
+
+/* =========================================
+   DIVIDER
+   ========================================= */
+
+.profile-menu-divider {
+
+  height: 1px;
+
+  background: #e5e7eb;
+}
+
+
+/* =========================================
+   LOGOUT
+   ========================================= */
+
+.profile-menu-item {
+
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 12px 16px;
+
+  border: none;
+
+  background: transparent;
+
+  text-align: left;
+
+  font-size: 13px;
+
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+
+.profile-menu-item .material-icons-outlined {
+
+  font-size: 20px;
+}
+
+
+.logout-item {
+
+  color: #dc2626;
+}
+
+
+.logout-item:hover {
+
+  background: #fef2f2;
+
+  color: #b91c1c;
 }
 
 .table-container {
@@ -1628,6 +2148,94 @@ body{
     width: 100%;
   }
 
+}
+
+/* =========================================
+   IT SIDEBAR CONTAINER
+   ========================================= */
+
+#it-sidebar {
+  flex: 0 0 250px;
+  width: 250px;
+  min-width: 250px;
+  
+}
+
+/* =========================================
+   TOPBAR USER INFO
+   ========================================= */
+
+.topbar-user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.topbar-user-info span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.topbar-user-info small {
+  margin-top: 3px;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+
+/* =========================================
+   LOGOUT BUTTON
+   ========================================= */
+
+.logout-button {
+  height: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 13px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #374151;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.logout-button:hover {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+.logout-button:active {
+  transform: translateY(1px);
+}
+
+.logout-button .material-icons-outlined {
+  font-size: 18px;
+}
+
+/* Make the actual sidebar fill its container */
+
+#it-sidebar .sidebar {
+  width: 100%;
+  min-width: 250px;
+  
 }
 
 </style>

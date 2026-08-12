@@ -1,18 +1,97 @@
 <header class="topbar">
 
   <div class="topbar-title">
-    Dashboard
+    
   </div>
 
   <div class="topbar-actions">
 
+    <!-- Notification -->
     <span class="material-icons-outlined notification-icon">
       notifications
     </span>
 
-    <div class="user-profile">
-      <span class="material-icons-outlined">account_circle</span>
-      <span>IT Staff</span>
+
+    <!-- USER PROFILE -->
+    <div class="user-profile-wrapper">
+
+      <button
+        type="button"
+        class="user-profile"
+        onclick="toggleUserMenu()"
+      >
+
+        <span class="material-icons-outlined">
+          account_circle
+        </span>
+
+        <div class="user-profile-info">
+
+          <span id="topbarUserName">
+            IT Staff
+          </span>
+
+          <small id="topbarUserPosition">
+            IT Support
+          </small>
+
+        </div>
+
+        <span class="material-icons-outlined user-dropdown-icon">
+          expand_more
+        </span>
+
+      </button>
+
+
+      <!-- USER DROPDOWN -->
+      <div
+        id="userProfileMenu"
+        class="user-profile-menu"
+      >
+
+        <div class="profile-menu-header">
+
+          <span class="material-icons-outlined">
+            account_circle
+          </span>
+
+          <div>
+
+            <strong id="profileMenuName">
+              IT Staff
+            </strong>
+
+            <small id="profileMenuPosition">
+              IT Support
+            </small>
+
+          </div>
+
+        </div>
+
+
+        <div class="profile-menu-divider"></div>
+
+
+        <button
+          type="button"
+          class="profile-menu-item logout-item"
+          onclick="logout()"
+        >
+
+          <span class="material-icons-outlined">
+            logout
+          </span>
+
+          <span>
+            Logout
+          </span>
+
+        </button>
+
+      </div>
+
     </div>
 
   </div>

@@ -2,24 +2,106 @@
 
   <div class="login-card">
 
+    <!-- LOGIN ICON -->
+    <div class="login-icon">
+      <span class="material-icons-outlined">
+        headset_mic
+      </span>
+    </div>
+
     <h1>Headset Inventory System</h1>
 
-    <p>IT Department Login</p>
+    <p class="login-subtitle">
+      IT Department Login
+    </p>
 
-    <input
-      type="text"
-      id="username"
-      placeholder="Username"
-      autocomplete="off">
 
-    <input
-      type="password"
-      id="password"
-      placeholder="Password">
+    <div class="login-form">
 
-    <button onclick="login()">
-      Login
-    </button>
+      <!-- USERNAME -->
+      <div class="login-field">
+
+        <label for="username">
+          Username
+        </label>
+
+        <div class="input-wrapper">
+
+          <span class="material-icons-outlined">
+            person
+          </span>
+
+          <input
+            type="text"
+            id="username"
+            placeholder="Enter your username"
+            autocomplete="off"
+            onkeydown="if(event.key === 'Enter') login()"
+          >
+
+        </div>
+
+      </div>
+
+
+      <!-- PASSWORD -->
+      <div class="login-field">
+
+        <label for="password">
+          Password
+        </label>
+
+        <div class="input-wrapper">
+
+          <span class="material-icons-outlined">
+            lock
+          </span>
+
+          <input
+            type="password"
+            id="password"
+            placeholder="Enter your password"
+            onkeydown="if(event.key === 'Enter') login()"
+          >
+
+        </div>
+
+      </div>
+
+
+      <!-- LOGIN -->
+      <button
+        type="button"
+        id="loginButton"
+        class="login-button"
+        onclick="login()"
+      >
+
+        <span class="material-icons-outlined">
+          login
+        </span>
+
+        Login
+
+      </button>
+
+
+      <!-- BACK TO DASHBOARD -->
+      <button
+        type="button"
+        class="back-dashboard-button"
+        onclick="closeITLogin()"
+      >
+
+        <span class="material-icons-outlined">
+          arrow_back
+        </span>
+
+        Back to Dashboard
+
+      </button>
+
+    </div>
 
   </div>
 

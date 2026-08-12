@@ -4,55 +4,229 @@
 <head>
 
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1">
+
   <base target="_top">
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <link
+    href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+    rel="stylesheet">
 
   <?!= include("Styles"); ?>
 
 </head>
 
+
 <body>
 
-  <div id="login-container">
-    <?!= include("Home"); ?>
-  </div>
 
-  <div id="app-layout" style="display:none;">
+  <!-- =====================================================
+       MAIN APPLICATION SHELL
+       ===================================================== -->
 
-    <?!= include("Sidebar"); ?>
+  <div id="app-layout">
 
-    <div class="main-content">
 
-      <?!= include("Topbar"); ?>
+    <!-- ===================================================
+         IT SIDEBAR
+         Hidden for public users
+         =================================================== -->
 
-      <main id="page-content">
+    <div id="it-sidebar" style="display:none;">
 
-        <?!= include("Dashboard"); ?>
-
-        <?!= include("Inventory"); ?>
-
-        <?!= include("TransactionHistory"); ?>
-
-      </main>
+      <?!= include("Sidebar"); ?>
 
     </div>
 
-    <?!= include("Dashboard.js"); ?>
-    <?!= include("Inventory.js"); ?>
-    <?!= include("TransactionHistory.js"); ?>
+
+    <!-- ===================================================
+         MAIN CONTENT
+         =================================================== -->
+
+    <div class="main-content">
+
+
+      <!-- IT TOPBAR -->
+
+      <div id="it-topbar" style="display:none;">
+
+        <?!= include("Topbar"); ?>
+
+      </div>
+
+
+      <!-- =================================================
+           PAGES
+           ================================================= -->
+
+      <main id="page-content">
+
+
+        <!-- DASHBOARD -->
+
+        <?!= include("Dashboard"); ?>
+
+
+        <!-- INVENTORY -->
+
+        <?!= include("Inventory"); ?>
+
+
+        <!-- TRANSACTION HISTORY -->
+
+        <?!= include("TransactionHistory"); ?>
+
+
+      </main>
+
+
+    </div>
 
   </div>
 
+
+
+  <!-- =====================================================
+       IT LOGIN
+       ===================================================== -->
+
+  <div
+    id="login-container"
+    style="display:none;">
+
+    <?!= include("Home"); ?>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       IT LOGIN BUTTON
+       ===================================================== -->
+
+  <div id="itLoginButton">
+
+    <button
+      type="button"
+      class="btn-primary"
+      onclick="openITLogin()">
+
+      <span class="material-icons-outlined">
+        lock
+      </span>
+
+      IT Login
+
+    </button>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       JAVASCRIPT
+       ===================================================== -->
+
+  <?!= include("Dashboard.js"); ?>
+
+  <?!= include("Inventory.js"); ?>
+
+  <?!= include("TransactionHistory.js"); ?>
+
   <?!= include("Scripts"); ?>
+
+
+  <!-- =====================================================
+       MODALS
+       ===================================================== -->
+
   <?!= include("IssueHeadsetModal"); ?>
+
   <?!= include("AddHeadsetModal"); ?>
-  <?!= include('Dashboard.js.html'); ?>
-  <?!= include('Inventory.js.html'); ?>
-  <?!= include('BorrowModal.html'); ?>
-  <?!= include('ReturnModal.html'); ?>
+
+  <?!= include("BorrowModal"); ?>
+
+  <?!= include("ReturnModal"); ?>
+
+
+  <!-- =====================================================
+       PUBLIC / IT LOGIN CONTROL
+       ===================================================== -->
+
+  <script>
+
+    function openITLogin() {
+
+      console.log("Opening IT Login");
+
+
+      const loginContainer =
+        document.getElementById("login-container");
+
+      const loginButton =
+        document.getElementById("itLoginButton");
+
+
+      if (loginButton) {
+
+        loginButton.style.display = "none";
+
+      }
+
+
+      if (loginContainer) {
+
+        loginContainer.style.display = "flex";
+
+      }
+
+
+      const username =
+        document.getElementById("username");
+
+
+      if (username) {
+
+        username.focus();
+
+      }
+
+    }
+
+
+    function closeITLogin() {
+
+      const loginContainer =
+        document.getElementById("login-container");
+
+      const loginButton =
+        document.getElementById("itLoginButton");
+
+
+      if (loginContainer) {
+
+        loginContainer.style.display = "none";
+
+      }
+
+
+      if (loginButton) {
+
+        loginButton.style.display = "block";
+
+      }
+
+    }
+
+  </script>
+
 
 </body>
 

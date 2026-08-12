@@ -4,10 +4,539 @@
 
 function login() {
 
-  document.getElementById("login-container").style.display = "none";
-  document.getElementById("app-layout").style.display = "flex";
+  console.log("LOGIN ATTEMPT");
 
-  loadDashboardStats();
+  // =========================================
+  // GET LOGIN VALUES
+  // =========================================
+
+  const usernameInput =
+    document.getElementById("username");
+
+  const passwordInput =
+    document.getElementById("password");
+
+  const username =
+    usernameInput ? usernameInput.value.trim() : "";
+
+  const password =
+    passwordInput ? passwordInput.value : "";
+
+
+  // =========================================
+  // BASIC VALIDATION
+  // =========================================
+
+  if (!username || !password) {
+
+    alert("Please enter your username and password.");
+
+    return;
+  }
+
+
+  // =========================================
+  // DISABLE LOGIN BUTTON
+  // =========================================
+
+  const loginBtn =
+    document.querySelector(".login-button");
+
+  if (loginBtn) {
+
+    loginBtn.disabled = true;
+
+    loginBtn.innerHTML =
+      '<span class="material-icons-outlined">hourglass_empty</span> Logging in...';
+  }
+
+
+  // =========================================
+  // AUTHENTICATE WITH GOOGLE APPS SCRIPT
+  // =========================================
+
+  google.script.run
+
+    .withSuccessHandler(function(result) {
+
+      console.log("AUTHENTICATION RESULT:", result);
+
+
+      // =======================================
+      // LOGIN FAILED
+      // =======================================
+
+      if (!result || !result.success) {
+
+        alert(
+          result && result.message
+            ? result.message
+            : "Invalid username or password."
+        );
+
+
+        // Restore button
+
+        if (loginBtn) {
+
+          loginBtn.disabled = false;
+
+          loginBtn.innerHTML =
+            '<span class="material-icons-outlined">login</span> Login';
+        }
+
+        return;
+      }
+
+
+      // =======================================
+      // LOGIN SUCCESSFUL
+      // =======================================
+
+      console.log("IT LOGIN SUCCESSFUL");
+
+      console.log(
+        "Logged in user:",
+        result.fullName
+      );
+
+
+      // =======================================
+      // SAVE LOGGED-IN USER
+      // =======================================
+
+      window.currentITUser = result;
+
+
+      // =======================================
+      // HIDE LOGIN SCREEN
+      // =======================================
+
+      const loginContainer =
+        document.getElementById("login-container");
+
+      if (loginContainer) {
+
+        loginContainer.style.display = "none";
+      }
+
+
+      // =======================================
+      // HIDE PUBLIC LOGIN BUTTON
+      // =======================================
+
+      const loginButton =
+        document.getElementById("itLoginButton");
+
+      if (loginButton) {
+
+        loginButton.style.display = "none";
+      }
+
+
+      // =======================================
+      // SHOW IT SIDEBAR
+      // =======================================
+
+      const sidebar =
+        document.getElementById("it-sidebar");
+
+      if (sidebar) {
+
+        sidebar.style.display = "block";
+      }
+
+
+      // =======================================
+      // SHOW IT TOPBAR
+      // =======================================
+
+      const topbar =
+        document.getElementById("it-topbar");
+
+      if (topbar) {
+
+        topbar.style.display = "block";
+      }
+
+
+      // =======================================
+      // SHOW IT APPLICATION
+      // =======================================
+
+      const appLayout =
+        document.getElementById("app-layout");
+
+      if (appLayout) {
+
+        appLayout.style.display = "flex";
+      }
+
+
+      // =======================================
+      // UPDATE TOPBAR USER
+      // =======================================
+
+      const userName =
+        document.getElementById("topbarUserName");
+
+      const userPosition =
+        document.getElementById("topbarUserPosition");
+
+      if (userName) {
+
+        userName.textContent =
+          result.fullName;
+      }
+
+      if (userPosition) {
+
+        userPosition.textContent =
+          result.position;
+      }
+
+      const profileMenuName =
+        document.getElementById("profileMenuName");
+
+      const profileMenuPosition =
+        document.getElementById("profileMenuPosition");
+
+      if (profileMenuName) {
+        profileMenuName.textContent =
+          result.fullName;
+      }
+
+      if (profileMenuPosition) {
+        profileMenuPosition.textContent =
+          result.position;
+      }
+
+
+      // =======================================
+      // LOAD DASHBOARD
+      // =======================================
+
+      loadDashboard();
+
+
+      // =======================================
+      // RETURN TO TOP
+      // =======================================
+
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "instant"
+      });
+
+    })
+
+
+    // =========================================
+    // SERVER ERROR
+    // =========================================
+
+    .withFailureHandler(function(error) {
+
+      console.error(
+        "LOGIN ERROR:",
+        error
+      );
+
+      alert(
+        "Unable to connect to the authentication system."
+      );
+
+
+      // Restore button
+
+      if (loginBtn) {
+
+        loginBtn.disabled = false;
+
+        loginBtn.innerHTML =
+          '<span class="material-icons-outlined">login</span> Login';
+      }
+
+    })
+
+
+    .authenticateUser(
+      username,
+      password
+    );
+
+}
+
+function logout() {
+
+  console.log("IT USER LOGGING OUT");
+
+  // =========================================
+  // CLEAR CURRENT USER
+  // =========================================
+
+  window.currentITUser = null;
+
+
+  // =========================================
+  // HIDE IT SIDEBAR
+  // =========================================
+
+  const sidebar =
+    document.getElementById("it-sidebar");
+
+  if (sidebar) {
+    sidebar.style.display = "none";
+  }
+
+
+  // =========================================
+  // HIDE IT TOPBAR
+  // =========================================
+
+  const topbar =
+    document.getElementById("it-topbar");
+
+  if (topbar) {
+    topbar.style.display = "none";
+  }
+
+
+  // =========================================
+  // SHOW PUBLIC LOGIN BUTTON
+  // =========================================
+
+  const loginButton =
+    document.getElementById("itLoginButton");
+
+  if (loginButton) {
+    loginButton.style.display = "block";
+  }
+
+
+  // =========================================
+  // HIDE LOGIN SCREEN
+  // =========================================
+
+  const loginContainer =
+    document.getElementById("login-container");
+
+  if (loginContainer) {
+    loginContainer.style.display = "none";
+  }
+
+
+  // =========================================
+  // CLEAR LOGIN FIELDS
+  // =========================================
+
+  const usernameInput =
+    document.getElementById("username");
+
+  const passwordInput =
+    document.getElementById("password");
+
+  if (usernameInput) {
+    usernameInput.value = "";
+  }
+
+  if (passwordInput) {
+    passwordInput.value = "";
+  }
+
+
+  // =========================================
+  // RESET LOGIN BUTTON
+  // =========================================
+
+  const loginBtn =
+    document.querySelector(".login-button");
+
+  if (loginBtn) {
+
+    loginBtn.disabled = false;
+
+    loginBtn.innerHTML =
+      '<span class="material-icons-outlined">login</span> Login';
+  }
+
+
+  // =========================================
+  // RESET TOPBAR USER
+  // =========================================
+
+  const userName =
+    document.getElementById("topbarUserName");
+
+  const userPosition =
+    document.getElementById("topbarUserPosition");
+
+  if (userName) {
+    userName.textContent = "IT Staff";
+  }
+
+  if (userPosition) {
+    userPosition.textContent = "IT Support";
+  }
+
+
+  // =========================================
+  // RETURN TO TOP
+  // =========================================
+
+  window.scrollTo({
+    top: 0,
+    left: 0,
+    behavior: "instant"
+  });
+
+
+  console.log("IT USER LOGGED OUT");
+
+}
+
+// =========================================
+// USER PROFILE MENU
+// =========================================
+
+function toggleUserMenu() {
+
+  const menu =
+    document.getElementById("userProfileMenu");
+
+  if (!menu) return;
+
+  menu.classList.toggle("show");
+
+}
+
+
+// =========================================
+// CLOSE USER MENU WHEN CLICKING OUTSIDE
+// =========================================
+
+document.addEventListener("click", function(event) {
+
+  const wrapper =
+    document.querySelector(".user-profile-wrapper");
+
+  const menu =
+    document.getElementById("userProfileMenu");
+
+  if (!wrapper || !menu) return;
+
+  if (!wrapper.contains(event.target)) {
+
+    menu.classList.remove("show");
+
+  }
+
+});
+
+function showPage(page) {
+
+  const dashboard =
+    document.getElementById("dashboard-page");
+
+  const inventory =
+    document.getElementById("inventory-page");
+
+  const transactions =
+    document.getElementById("transaction-history-page");
+
+
+  // Hide everything
+
+  if (dashboard) {
+    dashboard.style.display = "none";
+  }
+
+  if (inventory) {
+    inventory.style.display = "none";
+  }
+
+  if (transactions) {
+    transactions.style.display = "none";
+  }
+
+
+  // Show requested page
+
+  if (page === "dashboard" && dashboard) {
+
+    dashboard.style.display = "block";
+
+  }
+
+  if (page === "inventory" && inventory) {
+
+    inventory.style.display = "block";
+
+  }
+
+  if (
+    page === "transactions" &&
+    transactions
+  ) {
+
+    transactions.style.display = "block";
+
+  }
+
+
+  // Update sidebar active state
+
+  document
+    .querySelectorAll(".menu-item")
+    .forEach(function(item) {
+
+      item.classList.remove("active");
+
+    });
+
+
+  if (page === "dashboard") {
+
+    document
+      .getElementById("menuDashboard")
+      ?.classList.add("active");
+
+  }
+
+  if (page === "inventory") {
+
+    document
+      .getElementById("menuInventory")
+      ?.classList.add("active");
+
+  }
+
+  if (page === "transactions") {
+
+    document
+      .getElementById("menuTransactions")
+      ?.classList.add("active");
+
+  }
+
+}
+
+function loadPublicDashboard() {
+
+  console.log("=================================");
+  console.log("LOADING PUBLIC DASHBOARD");
+  console.log("=================================");
+
+  // Load dashboard statistics
+  if (typeof loadDashboardStats === "function") {
+    loadDashboardStats();
+  }
+
+  // Load recent transactions
+  if (typeof loadRecentTransactions === "function") {
+    loadRecentTransactions();
+  }
 
 }
 
@@ -3930,5 +4459,41 @@ function saveReturnHeadset() {
     .returnHeadset(data);
 
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+
+  console.log("Headset Inventory System loaded.");
+
+  loadPublicDashboard();
+
+});
+
+window.addEventListener("scroll", function() {
+
+  const loginButton =
+    document.getElementById("itLoginButton");
+
+  if (!loginButton) {
+    return;
+  }
+
+  if (window.scrollY > 50) {
+
+    // Hide when scrolling down
+    loginButton.style.opacity = "0";
+    loginButton.style.transform = "translateY(-20px)";
+    loginButton.style.pointerEvents = "none";
+
+  } else {
+
+    // Show again at the top
+    loginButton.style.opacity = "1";
+    loginButton.style.transform = "translateY(0)";
+    loginButton.style.pointerEvents = "auto";
+
+  }
+
+});
+
 
 </script>
