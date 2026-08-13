@@ -294,3 +294,107 @@ function getActivityLogs() {
   }).reverse();
 
 }
+
+function getActivityLogs() {
+
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
+
+  const sheet =
+    ss.getSheetByName("Activity Logs");
+
+  if (!sheet) {
+
+    throw new Error(
+      'Sheet "Activity Logs" was not found.'
+    );
+
+  }
+
+  const lastRow =
+    sheet.getLastRow();
+
+  // Header only / no records
+  if (lastRow < 2) {
+    return [];
+  }
+
+  /*
+   * Activity Logs:
+   *
+   * A = Timestamp
+   * B = IT Username
+   * C = IT Full Name
+   * D = IT Position
+   * E = Action
+   * F = Asset ID
+   * G = Employee
+   * H = Description
+   */
+
+  const data =
+    sheet
+      .getRange(
+        2,
+        1,
+        lastRow - 1,
+        8
+      )
+      .getDisplayValues();
+
+
+  const logs = [];
+
+
+  data.forEach(function(row) {
+
+    // Ignore completely empty rows
+    if (
+      row.every(function(value) {
+        return String(value).trim() === "";
+      })
+    ) {
+      return;
+    }
+
+
+    logs.push({
+
+      timestamp:
+        row[0] || "",
+
+      username:
+        row[1] || "",
+
+      fullName:
+        row[2] || "",
+
+      position:
+        row[3] || "",
+
+      action:
+        row[4] || "",
+
+      assetId:
+        row[5] || "",
+
+      employee:
+        row[6] || "",
+
+      description:
+        row[7] || ""
+
+    });
+
+  });
+
+
+  console.log(
+    "Activity Logs retrieved: " +
+    logs.length
+  );
+
+
+  return logs;
+
+}

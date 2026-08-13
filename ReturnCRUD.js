@@ -358,9 +358,13 @@ function getActiveBorrowRecord(assetId) {
 
 }
 
-
 /**
- * Save a Return transaction.
+ * =========================================
+ * RETURN HEADSET
+ * =========================================
+ *
+ * Saves the return transaction and automatically
+ * creates an IT Activity Log.
  *
  * Return Logs:
  *
@@ -397,10 +401,28 @@ function returnHeadset(data) {
   }
 
 
-  if (!data.checkedBy) {
+  /*
+   * =========================================
+   * GET LOGGED-IN IT USER
+   * =========================================
+   */
+
+  const currentITUser =
+    data.currentITUser || {};
+
+
+  const checkedBy =
+    currentITUser.fullName ||
+    data.checkedBy ||
+    "";
+
+
+  if (!checkedBy) {
+
     throw new Error(
-      "Checked By is required."
+      "Unable to identify the logged-in IT staff."
     );
+
   }
 
 
@@ -427,7 +449,9 @@ function returnHeadset(data) {
 
 
   /*
-   * Find the headset in Master Inventory.
+   * =========================================
+   * FIND HEADSET
+   * =========================================
    */
 
   const headset =
@@ -558,6 +582,9 @@ function returnHeadset(data) {
 
   /*
    * G - Checked By
+   *
+   * Automatically comes from the
+   * logged-in IT staff.
    */
 
   returnSheet
@@ -566,7 +593,7 @@ function returnHeadset(data) {
       7
     )
     .setValue(
-      data.checkedBy
+      checkedBy
     );
 
 
@@ -589,8 +616,8 @@ function returnHeadset(data) {
    * BORROWED HEADSET
    * =========================================
    *
-   * If this headset came from Borrow Logs,
-   * change:
+   * If this headset was borrowed,
+   * update Borrow Logs:
    *
    * Borrowed → Returned
    */
@@ -635,20 +662,83 @@ function returnHeadset(data) {
   }
 
 
+  /*
+   * =========================================
+   * ACTIVITY LOG
+   * =========================================
+   *
+   * Automatically record who returned
+   * the headset.
+   */
+
+  saveActivityLog({
+
+    user: {
+
+      username:
+        currentITUser.username || "",
+
+      fullName:
+        currentITUser.fullName || checkedBy,
+
+      position:
+        currentITUser.position || "IT Staff"
+
+    },
+
+    action:
+      "RETURNED HEADSET",
+
+    assetId:
+      headset.assetId,
+
+    employee:
+      headset.agentName || "",
+
+    description:
+      "Returned headset " +
+      headset.assetId +
+      " from " +
+      (headset.agentName || "Unknown Employee") +
+      ". Condition upon return: " +
+      data.statusUponReturn +
+      "." +
+      (
+        data.remarks
+          ? " Remarks: " + data.remarks + "."
+          : ""
+      )
+
+  });
+
+
   SpreadsheetApp.flush();
 
+
+  /*
+   * =========================================
+   * SUCCESS
+   * =========================================
+   */
 
   return {
 
     success: true,
 
-    returnRow: returnRow,
+    returnRow:
+      returnRow,
 
-    assetId: headset.assetId,
+    assetId:
+      headset.assetId,
 
-    previousStatus: headset.status,
+    previousStatus:
+      headset.status,
 
-    agentName: headset.agentName
+    agentName:
+      headset.agentName,
+
+    checkedBy:
+      checkedBy
 
   };
 

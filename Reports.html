@@ -10,13 +10,8 @@
   <div class="page-header">
 
     <div>
-
       <h1>IT Activity Report</h1>
-
-      <p>
-        Track all actions performed by IT staff
-      </p>
-
+      <p>Monitor headset activities performed by IT staff</p>
     </div>
 
   </div>
@@ -26,8 +21,7 @@
        ACTIVITY SUMMARY
        ========================================= -->
 
-  <div class="dashboard-stats">
-
+  <div class="dashboard-stats reports-stats">
 
     <!-- TOTAL ACTIVITIES -->
 
@@ -38,15 +32,8 @@
       </span>
 
       <div>
-
-        <h3 id="activityTotal">
-          0
-        </h3>
-
-        <p>
-          Total Activities
-        </p>
-
+        <h3 id="activityTotal">0</h3>
+        <p>Total Activities</p>
       </div>
 
     </div>
@@ -61,21 +48,14 @@
       </span>
 
       <div>
-
-        <h3 id="activityITStaff">
-          0
-        </h3>
-
-        <p>
-          IT Staff
-        </p>
-
+        <h3 id="activityITStaff">0</h3>
+        <p>IT Staff</p>
       </div>
 
     </div>
 
 
-    <!-- HEADSETS HANDLED -->
+    <!-- HEADSETS -->
 
     <div class="stat-card">
 
@@ -84,15 +64,8 @@
       </span>
 
       <div>
-
-        <h3 id="activityHeadsets">
-          0
-        </h3>
-
-        <p>
-          Headsets Handled
-        </p>
-
+        <h3 id="activityHeadsets">0</h3>
+        <p>Headsets Handled</p>
       </div>
 
     </div>
@@ -107,29 +80,20 @@
       </span>
 
       <div>
-
-        <h3 id="activityToday">
-          0
-        </h3>
-
-        <p>
-          Today's Activities
-        </p>
-
+        <h3 id="activityToday">0</h3>
+        <p>Today's Activities</p>
       </div>
 
     </div>
-
 
   </div>
 
 
   <!-- =========================================
-       FILTERS
+       FILTER TOOLBAR
        ========================================= -->
 
   <div class="reports-toolbar">
-
 
     <!-- SEARCH -->
 
@@ -142,13 +106,13 @@
       <input
         type="text"
         id="activitySearch"
-        placeholder="Search IT staff, asset ID, employee..."
+        placeholder="Search activity..."
         autocomplete="off">
 
     </div>
 
 
-    <!-- IT STAFF FILTER -->
+    <!-- IT STAFF -->
 
     <select id="activityStaffFilter">
 
@@ -159,7 +123,7 @@
     </select>
 
 
-    <!-- ACTION FILTER -->
+    <!-- ACTION -->
 
     <select id="activityActionFilter">
 
@@ -170,7 +134,7 @@
     </select>
 
 
-    <!-- DATE FILTER -->
+    <!-- DATE -->
 
     <select id="activityDateFilter">
 
@@ -193,7 +157,7 @@
     </select>
 
 
-    <!-- CLEAR FILTERS -->
+    <!-- CLEAR -->
 
     <button
       type="button"
@@ -208,7 +172,6 @@
 
     </button>
 
-
   </div>
 
 
@@ -216,16 +179,13 @@
        ACTIVITY HISTORY
        ========================================= -->
 
-  <div class="recent-transactions-card">
-
+  <div class="recent-transactions-card reports-card">
 
     <div class="section-header">
 
       <div>
 
-        <h2>
-          Activity History
-        </h2>
+        <h2>Activity History</h2>
 
         <p>
           Complete history of IT headset activities
@@ -236,44 +196,29 @@
     </div>
 
 
-    <!-- TABLE -->
+    <!-- =======================================
+         TABLE
+         ======================================= -->
 
     <div class="transactions-table-wrapper">
 
-      <table class="transactions-table">
-
+      <table class="transactions-table activity-table">
 
         <thead>
 
           <tr>
 
-            <th>
-              Timestamp
-            </th>
+            <th>Timestamp</th>
 
-            <th>
-              IT Staff
-            </th>
+            <th>IT Staff</th>
 
-            <th>
-              Position
-            </th>
+            <th>Action</th>
 
-            <th>
-              Action
-            </th>
+            <th>Asset ID</th>
 
-            <th>
-              Asset ID
-            </th>
+            <th>Employee</th>
 
-            <th>
-              Employee
-            </th>
-
-            <th>
-              Description
-            </th>
+            <th>Description</th>
 
           </tr>
 
@@ -285,10 +230,10 @@
           <tr>
 
             <td
-              colspan="7"
+              colspan="6"
               class="transactions-loading">
 
-              Activity history will appear here.
+              Loading activity history...
 
             </td>
 
@@ -296,28 +241,23 @@
 
         </tbody>
 
-
       </table>
 
     </div>
 
 
-    <!-- =========================================
+    <!-- =======================================
          PAGINATION
-         ========================================= -->
+         ======================================= -->
 
     <div class="pagination-container">
 
-
       <div id="activityPaginationInfo">
-
         Showing 0 activities
-
       </div>
 
 
       <div class="pagination-buttons">
-
 
         <button
           type="button"
@@ -335,9 +275,7 @@
 
 
         <span id="activityPageInfo">
-
           Page 1 of 1
-
         </span>
 
 
@@ -355,11 +293,9 @@
 
         </button>
 
-
       </div>
 
     </div>
-
 
   </div>
 

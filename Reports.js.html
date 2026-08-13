@@ -58,7 +58,7 @@
           body.innerHTML = `
             <tr>
               <td
-                colspan="7"
+                colspan="6"
                 class="transactions-loading">
 
                 Unable to load activity history.
@@ -82,24 +82,21 @@
 
   function updateActivitySummary() {
 
+    // =========================================
+    // TOTAL ACTIVITIES
+    // =========================================
+
     const total =
       activityLogs.length;
 
 
-    const staff = new Set();
+    // =========================================
+    // UNIQUE HEADSETS IN ACTIVITY LOG
+    // =========================================
 
     const assets = new Set();
 
-
     activityLogs.forEach(function(log) {
-
-      if (log.fullName) {
-
-        staff.add(
-          String(log.fullName).trim()
-        );
-
-      }
 
       if (log.assetId) {
 
@@ -111,6 +108,10 @@
 
     });
 
+
+    // =========================================
+    // TODAY'S ACTIVITIES
+    // =========================================
 
     const today =
       new Date();
@@ -140,11 +141,17 @@
           0
         );
 
-        return date.getTime() ===
-          today.getTime();
+        return (
+          date.getTime() ===
+          today.getTime()
+        );
 
       }).length;
 
+
+    // =========================================
+    // GET REPORT ELEMENTS
+    // =========================================
 
     const totalElement =
       document.getElementById(
@@ -167,6 +174,10 @@
       );
 
 
+    // =========================================
+    // UPDATE TOTAL ACTIVITIES
+    // =========================================
+
     if (totalElement) {
 
       totalElement.textContent =
@@ -175,13 +186,9 @@
     }
 
 
-    if (staffElement) {
-
-      staffElement.textContent =
-        staff.size;
-
-    }
-
+    // =========================================
+    // UPDATE HEADSETS
+    // =========================================
 
     if (headsetElement) {
 
@@ -191,10 +198,49 @@
     }
 
 
+    // =========================================
+    // UPDATE TODAY
+    // =========================================
+
     if (todayElement) {
 
       todayElement.textContent =
         todayCount;
+
+    }
+
+
+    // =========================================
+    // GET REAL IT STAFF COUNT
+    // =========================================
+
+    if (staffElement) {
+
+      staffElement.textContent = "...";
+
+
+      google.script.run
+
+        .withSuccessHandler(function(count) {
+
+          staffElement.textContent =
+            Number(count) || 0;
+
+        })
+
+        .withFailureHandler(function(error) {
+
+          console.error(
+            "IT Staff count error:",
+            error
+          );
+
+          staffElement.textContent =
+            "0";
+
+        })
+
+        .getActiveITStaffCount();
 
     }
 
@@ -511,63 +557,36 @@
   function renderActivityLogs() {
 
     const body =
-      document.getElementById(
-        "activityLogsBody"
-      );
+      document.getElementById("activityLogsBody");
 
-
-    if (!body) {
-
-      return;
-
-    }
-
+    if (!body) return;
 
     body.innerHTML = "";
 
-
-    if (
-      filteredActivityLogs.length ===
-      0
-    ) {
+    if (filteredActivityLogs.length === 0) {
 
       body.innerHTML = `
         <tr>
-          <td
-            colspan="7"
-            class="transactions-loading">
-
+          <td colspan="6" class="transactions-loading">
             No activity records found.
-
           </td>
         </tr>
       `;
 
-
       updateActivityPagination();
-
       return;
-
     }
 
 
     const start =
-      (
-        activityCurrentPage - 1
-      ) *
+      (activityCurrentPage - 1) *
       activityRowsPerPage;
-
 
     const end =
-      start +
-      activityRowsPerPage;
-
+      start + activityRowsPerPage;
 
     const pageLogs =
-      filteredActivityLogs.slice(
-        start,
-        end
-      );
+      filteredActivityLogs.slice(start, end);
 
 
     pageLogs.forEach(function(log) {
@@ -578,34 +597,34 @@
 
       row.innerHTML = `
 
+        <!-- Timestamp -->
         <td>
           ${formatActivityDate(log.timestamp)}
         </td>
 
+
+        <!-- IT Staff -->
         <td>
           ${escapeActivityHtml(
             log.fullName ||
             log.username ||
-            "Unknown"
+            "-"
           )}
         </td>
 
-        <td>
-          ${escapeActivityHtml(
-            log.position ||
-            "IT Staff"
-          )}
-        </td>
 
+        <!-- Action -->
         <td>
           <strong>
             ${escapeActivityHtml(
               log.action ||
-              ""
+              "-"
             )}
           </strong>
         </td>
 
+
+        <!-- Asset ID -->
         <td>
           ${escapeActivityHtml(
             log.assetId ||
@@ -613,6 +632,8 @@
           )}
         </td>
 
+
+        <!-- Employee -->
         <td>
           ${escapeActivityHtml(
             log.employee ||
@@ -620,6 +641,8 @@
           )}
         </td>
 
+
+        <!-- Description -->
         <td>
           ${escapeActivityHtml(
             log.description ||

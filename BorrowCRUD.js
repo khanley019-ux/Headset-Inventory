@@ -108,13 +108,18 @@ function borrowHeadset(data) {
   // GET BORROW LOGS SHEET
   // =========================================
 
-  const sheet = SpreadsheetApp
-    .getActiveSpreadsheet()
-    .getSheetByName(CONFIG.SHEETS.BORROW);
+  const sheet =
+    SpreadsheetApp
+      .getActiveSpreadsheet()
+      .getSheetByName(
+        CONFIG.SHEETS.BORROW
+      );
 
 
   if (!sheet) {
-    throw new Error("Borrow Logs sheet not found.");
+    throw new Error(
+      "Borrow Logs sheet not found."
+    );
   }
 
 
@@ -125,13 +130,16 @@ function borrowHeadset(data) {
   const currentUser =
     data.currentITUser || {};
 
+
   const itUsername =
     currentUser.username || "";
+
 
   const itFullName =
     currentUser.fullName ||
     data.issuedBy ||
     "Unknown IT Staff";
+
 
   const itPosition =
     currentUser.position ||
@@ -143,7 +151,10 @@ function borrowHeadset(data) {
   // =========================================
 
   const row =
-    getFirstEmptyRow(sheet, 2);
+    getFirstEmptyRow(
+      sheet,
+      2
+    );
 
 
   // =========================================
@@ -192,17 +203,32 @@ function borrowHeadset(data) {
   // =========================================
   // ACTIVITY LOG
   // =========================================
+  //
+  // Current Activity Logs structure:
+  //
+  // Timestamp
+  // IT Staff
+  // Action
+  // Asset ID
+  // Employee
+  // Description
+  //
+  // =========================================
 
-  logActivity({
+  saveActivityLog({
 
-    itUsername:
-      itUsername,
+    user: {
 
-    itFullName:
-      itFullName,
+      username:
+        itUsername,
 
-    itPosition:
-      itPosition,
+      fullName:
+        itFullName,
+
+      position:
+        itPosition
+
+    },
 
     action:
       "BORROWED HEADSET",
@@ -216,10 +242,14 @@ function borrowHeadset(data) {
     description:
       "Borrowed headset " +
       data.assetId +
-      " by " +
-      data.agentName
+      " for " +
+      data.agentName +
+      "."
 
   });
+
+
+  SpreadsheetApp.flush();
 
 
   // =========================================
@@ -230,7 +260,16 @@ function borrowHeadset(data) {
 
     success: true,
 
-    row: row
+    row: row,
+
+    assetId:
+      data.assetId,
+
+    employee:
+      data.agentName,
+
+    borrowedBy:
+      itFullName
 
   };
 

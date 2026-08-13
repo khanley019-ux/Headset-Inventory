@@ -54,11 +54,13 @@ function saveHeadset(headset) {
     employee: "",
 
     description:
-      "Added " +
+      "Added headset " +
+      (headset.assetId || "") +
+      " (" +
       (headset.brand || "") +
       " " +
       (headset.model || "") +
-      " to inventory."
+      ") to inventory."
 
   });
 
