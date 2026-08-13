@@ -20,29 +20,45 @@ function loadTransactionHistory() {
     document.getElementById("inventory-page");
 
   const transactionPage =
-    document.getElementById("transaction-history-page");
+    document.getElementById(
+      "transaction-history-page"
+    );
+
+  const reportsPage =
+    document.getElementById("reports-page");
 
 
-  if (
-    !dashboardPage ||
-    !inventoryPage ||
-    !transactionPage
-  ) {
+  if (!transactionPage) {
 
     console.error(
       "Transaction History page elements not found."
     );
 
     return;
+
   }
 
 
-  dashboardPage.style.display = "none";
+  // Hide other pages
 
-  inventoryPage.style.display = "none";
+  if (dashboardPage) {
+    dashboardPage.style.display = "none";
+  }
 
-  transactionPage.style.display = "block";
+  if (inventoryPage) {
+    inventoryPage.style.display = "none";
+  }
 
+  if (transactionPage) {
+    transactionPage.style.display = "block";
+  }
+
+  if (reportsPage) {
+    reportsPage.style.display = "none";
+  }
+
+
+  // Sidebar active state
 
   document
     .getElementById("menuDashboard")
@@ -61,10 +77,18 @@ function loadTransactionHistory() {
     ?.classList.remove("active");
 
 
-  loadTransactionHistoryData();
+  // Load transaction history
+
+  if (
+    typeof loadTransactionHistoryData ===
+    "function"
+  ) {
+
+    loadTransactionHistoryData();
+
+  }
 
 }
-
 
 /* =========================================
    LOAD DATA

@@ -272,11 +272,69 @@ function logout() {
 
   console.log("IT USER LOGGING OUT");
 
+
   // =========================================
   // CLEAR CURRENT USER
   // =========================================
 
   window.currentITUser = null;
+
+
+  // =========================================
+  // HIDE ALL IT PAGES
+  // =========================================
+
+  const dashboardPage =
+    document.getElementById("dashboard-page");
+
+  const inventoryPage =
+    document.getElementById("inventory-page");
+
+  const transactionPage =
+    document.getElementById(
+      "transaction-history-page"
+    );
+
+  const reportsPage =
+    document.getElementById("reports-page");
+
+
+  if (dashboardPage) {
+    dashboardPage.style.display = "none";
+  }
+
+  if (inventoryPage) {
+    inventoryPage.style.display = "none";
+  }
+
+  if (transactionPage) {
+    transactionPage.style.display = "none";
+  }
+
+  if (reportsPage) {
+    reportsPage.style.display = "none";
+  }
+
+
+  // =========================================
+  // REMOVE ACTIVE SIDEBAR STATE
+  // =========================================
+
+  document
+    .getElementById("menuDashboard")
+    ?.classList.remove("active");
+
+  document
+    .getElementById("menuInventory")
+    ?.classList.remove("active");
+
+  document
+    .getElementById("menuTransactions")
+    ?.classList.remove("active");
+
+  document
+    .getElementById("menuReports")
+    ?.classList.remove("active");
 
 
   // =========================================
@@ -359,6 +417,7 @@ function logout() {
 
     loginBtn.innerHTML =
       '<span class="material-icons-outlined">login</span> Login';
+
   }
 
 
@@ -367,10 +426,15 @@ function logout() {
   // =========================================
 
   const userName =
-    document.getElementById("topbarUserName");
+    document.getElementById(
+      "topbarUserName"
+    );
 
   const userPosition =
-    document.getElementById("topbarUserPosition");
+    document.getElementById(
+      "topbarUserPosition"
+    );
+
 
   if (userName) {
     userName.textContent = "IT Staff";
@@ -392,22 +456,9 @@ function logout() {
   });
 
 
-  console.log("IT USER LOGGED OUT");
-
-}
-
-// =========================================
-// USER PROFILE MENU
-// =========================================
-
-function toggleUserMenu() {
-
-  const menu =
-    document.getElementById("userProfileMenu");
-
-  if (!menu) return;
-
-  menu.classList.toggle("show");
+  console.log(
+    "IT USER LOGGED OUT"
+  );
 
 }
 
@@ -1024,33 +1075,336 @@ function loadRecentTransactions() {
 
 }
 
+function loadReports() {
+
+  const dashboardPage =
+    document.getElementById("dashboard-page");
+
+  const inventoryPage =
+    document.getElementById("inventory-page");
+
+  const transactionPage =
+    document.getElementById("transaction-history-page");
+
+  const reportsPage =
+    document.getElementById("reports-page");
+
+
+  // =========================================
+  // CHECK REPORTS PAGE
+  // =========================================
+
+  if (!reportsPage) {
+
+    console.error(
+      "Reports page element not found."
+    );
+
+    return;
+  }
+
+
+  // =========================================
+  // HIDE OTHER PAGES
+  // =========================================
+
+  if (dashboardPage) {
+
+    dashboardPage.style.display = "none";
+
+  }
+
+
+  if (inventoryPage) {
+
+    inventoryPage.style.display = "none";
+
+  }
+
+
+  if (transactionPage) {
+
+    transactionPage.style.display = "none";
+
+  }
+
+
+  // =========================================
+  // SHOW REPORTS
+  // =========================================
+
+  reportsPage.style.display = "block";
+
+
+  // =========================================
+  // UPDATE SIDEBAR
+  // =========================================
+
+  document
+    .getElementById("menuDashboard")
+    ?.classList.remove("active");
+
+  document
+    .getElementById("menuInventory")
+    ?.classList.remove("active");
+
+  document
+    .getElementById("menuTransactions")
+    ?.classList.remove("active");
+
+  document
+    .getElementById("menuReports")
+    ?.classList.add("active");
+
+
+  // =========================================
+  // LOAD REPORT DATA
+  // =========================================
+
+  if (
+    typeof loadActivityLogs ===
+    "function"
+  ) {
+
+    loadActivityLogs();
+
+  }
+
+}
+
+function loadReports() {
+
+  const dashboardPage =
+    document.getElementById("dashboard-page");
+
+  const inventoryPage =
+    document.getElementById("inventory-page");
+
+  const transactionPage =
+    document.getElementById(
+      "transaction-history-page"
+    );
+
+  const reportsPage =
+    document.getElementById("reports-page");
+
+
+  if (!reportsPage) {
+
+    console.error(
+      "Reports page element not found."
+    );
+
+    return;
+
+  }
+
+
+  // =========================================
+  // HIDE ALL OTHER PAGES
+  // =========================================
+
+  if (dashboardPage) {
+    dashboardPage.style.display = "none";
+  }
+
+  if (inventoryPage) {
+    inventoryPage.style.display = "none";
+  }
+
+  if (transactionPage) {
+    transactionPage.style.display = "none";
+  }
+
+
+  // =========================================
+  // SHOW REPORTS
+  // =========================================
+
+  reportsPage.style.display = "block";
+
+
+  // =========================================
+  // SIDEBAR ACTIVE STATE
+  // =========================================
+
+  document
+    .getElementById("menuDashboard")
+    ?.classList.remove("active");
+
+  document
+    .getElementById("menuInventory")
+    ?.classList.remove("active");
+
+  document
+    .getElementById("menuTransactions")
+    ?.classList.remove("active");
+
+  document
+    .getElementById("menuReports")
+    ?.classList.add("active");
+
+
+  // =========================================
+  // LOAD ACTIVITY REPORT
+  // =========================================
+
+  if (
+    typeof loadActivityLogs ===
+    "function"
+  ) {
+
+    loadActivityLogs();
+
+  } else {
+
+    console.error(
+      "loadActivityLogs() is not available."
+    );
+
+  }
+
+}
+
 function loadInventory() {
 
-  document.getElementById("dashboard-page").style.display = "none";
-  document.getElementById("transaction-history-page").style.display = "none";
-  document.getElementById("inventory-page").style.display = "block";
+  const dashboardPage =
+    document.getElementById("dashboard-page");
 
-  document.getElementById("menuDashboard").classList.remove("active");
-  document.getElementById("menuTransactions").classList.remove("active");
-  document.getElementById("menuInventory").classList.add("active");
+  const inventoryPage =
+    document.getElementById("inventory-page");
 
-  loadInventoryData();
+  const transactionPage =
+    document.getElementById("transaction-history-page");
+
+  const reportsPage =
+    document.getElementById("reports-page");
+
+
+  if (dashboardPage) {
+    dashboardPage.style.display = "none";
+  }
+
+  if (inventoryPage) {
+    inventoryPage.style.display = "block";
+  }
+
+  if (transactionPage) {
+    transactionPage.style.display = "none";
+  }
+
+  if (reportsPage) {
+    reportsPage.style.display = "none";
+  }
+
+
+  // Sidebar active state
+
+  document
+    .getElementById("menuDashboard")
+    ?.classList.remove("active");
+
+  document
+    .getElementById("menuInventory")
+    ?.classList.add("active");
+
+  document
+    .getElementById("menuTransactions")
+    ?.classList.remove("active");
+
+  document
+    .getElementById("menuReports")
+    ?.classList.remove("active");
+
+
+  // Load inventory
+
+  if (
+    typeof loadInventoryData ===
+    "function"
+  ) {
+
+    loadInventoryData();
+
+  }
 
 }
 
 
+
 function loadDashboard() {
 
-  document.getElementById("inventory-page").style.display = "none";
-  document.getElementById("transaction-history-page").style.display = "none";
-  document.getElementById("dashboard-page").style.display = "block";
+  const dashboardPage =
+    document.getElementById("dashboard-page");
 
-  document.getElementById("menuInventory").classList.remove("active");
-  document.getElementById("menuTransactions").classList.remove("active");
-  document.getElementById("menuDashboard").classList.add("active");
+  const inventoryPage =
+    document.getElementById("inventory-page");
 
-  loadDashboardStats();
-  loadRecentTransactions();
+  const transactionPage =
+    document.getElementById("transaction-history-page");
+
+  const reportsPage =
+    document.getElementById("reports-page");
+
+
+  // Hide all pages
+
+  if (dashboardPage) {
+    dashboardPage.style.display = "block";
+  }
+
+  if (inventoryPage) {
+    inventoryPage.style.display = "none";
+  }
+
+  if (transactionPage) {
+    transactionPage.style.display = "none";
+  }
+
+  if (reportsPage) {
+    reportsPage.style.display = "none";
+  }
+
+
+  // Sidebar active state
+
+  document
+    .getElementById("menuDashboard")
+    ?.classList.add("active");
+
+  document
+    .getElementById("menuInventory")
+    ?.classList.remove("active");
+
+  document
+    .getElementById("menuTransactions")
+    ?.classList.remove("active");
+
+  document
+    .getElementById("menuReports")
+    ?.classList.remove("active");
+
+
+  // Load dashboard data
+
+  if (
+    typeof loadDashboardStats ===
+    "function"
+  ) {
+
+    loadDashboardStats();
+
+  }
+
+
+  if (
+    typeof loadRecentTransactions ===
+    "function"
+  ) {
+
+    loadRecentTransactions();
+
+  }
 
 }
 

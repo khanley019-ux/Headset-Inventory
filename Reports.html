@@ -1,9 +1,366 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <base target="_top">
-  </head>
-  <body>
-    
-  </body>
-</html>
+<div
+  id="reports-page"
+  class="page"
+  style="display:none;">
+
+  <!-- =========================================
+       PAGE HEADER
+       ========================================= -->
+
+  <div class="page-header">
+
+    <div>
+
+      <h1>IT Activity Report</h1>
+
+      <p>
+        Track all actions performed by IT staff
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================================
+       ACTIVITY SUMMARY
+       ========================================= -->
+
+  <div class="dashboard-stats">
+
+
+    <!-- TOTAL ACTIVITIES -->
+
+    <div class="stat-card">
+
+      <span class="material-icons-outlined">
+        history
+      </span>
+
+      <div>
+
+        <h3 id="activityTotal">
+          0
+        </h3>
+
+        <p>
+          Total Activities
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- IT STAFF -->
+
+    <div class="stat-card">
+
+      <span class="material-icons-outlined">
+        person
+      </span>
+
+      <div>
+
+        <h3 id="activityITStaff">
+          0
+        </h3>
+
+        <p>
+          IT Staff
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- HEADSETS HANDLED -->
+
+    <div class="stat-card">
+
+      <span class="material-icons-outlined">
+        headset_mic
+      </span>
+
+      <div>
+
+        <h3 id="activityHeadsets">
+          0
+        </h3>
+
+        <p>
+          Headsets Handled
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- TODAY -->
+
+    <div class="stat-card">
+
+      <span class="material-icons-outlined">
+        today
+      </span>
+
+      <div>
+
+        <h3 id="activityToday">
+          0
+        </h3>
+
+        <p>
+          Today's Activities
+        </p>
+
+      </div>
+
+    </div>
+
+
+  </div>
+
+
+  <!-- =========================================
+       FILTERS
+       ========================================= -->
+
+  <div class="reports-toolbar">
+
+
+    <!-- SEARCH -->
+
+    <div class="report-search">
+
+      <span class="material-icons-outlined">
+        search
+      </span>
+
+      <input
+        type="text"
+        id="activitySearch"
+        placeholder="Search IT staff, asset ID, employee..."
+        autocomplete="off">
+
+    </div>
+
+
+    <!-- IT STAFF FILTER -->
+
+    <select id="activityStaffFilter">
+
+      <option value="">
+        All IT Staff
+      </option>
+
+    </select>
+
+
+    <!-- ACTION FILTER -->
+
+    <select id="activityActionFilter">
+
+      <option value="">
+        All Actions
+      </option>
+
+    </select>
+
+
+    <!-- DATE FILTER -->
+
+    <select id="activityDateFilter">
+
+      <option value="">
+        All Dates
+      </option>
+
+      <option value="today">
+        Today
+      </option>
+
+      <option value="week">
+        This Week
+      </option>
+
+      <option value="month">
+        This Month
+      </option>
+
+    </select>
+
+
+    <!-- CLEAR FILTERS -->
+
+    <button
+      type="button"
+      class="btn-secondary"
+      id="btnClearActivityFilters">
+
+      <span class="material-icons-outlined">
+        filter_alt_off
+      </span>
+
+      Clear
+
+    </button>
+
+
+  </div>
+
+
+  <!-- =========================================
+       ACTIVITY HISTORY
+       ========================================= -->
+
+  <div class="recent-transactions-card">
+
+
+    <div class="section-header">
+
+      <div>
+
+        <h2>
+          Activity History
+        </h2>
+
+        <p>
+          Complete history of IT headset activities
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- TABLE -->
+
+    <div class="transactions-table-wrapper">
+
+      <table class="transactions-table">
+
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Timestamp
+            </th>
+
+            <th>
+              IT Staff
+            </th>
+
+            <th>
+              Position
+            </th>
+
+            <th>
+              Action
+            </th>
+
+            <th>
+              Asset ID
+            </th>
+
+            <th>
+              Employee
+            </th>
+
+            <th>
+              Description
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody id="activityLogsBody">
+
+          <tr>
+
+            <td
+              colspan="7"
+              class="transactions-loading">
+
+              Activity history will appear here.
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+
+      </table>
+
+    </div>
+
+
+    <!-- =========================================
+         PAGINATION
+         ========================================= -->
+
+    <div class="pagination-container">
+
+
+      <div id="activityPaginationInfo">
+
+        Showing 0 activities
+
+      </div>
+
+
+      <div class="pagination-buttons">
+
+
+        <button
+          type="button"
+          id="activityPreviousPage"
+          class="btn-secondary"
+          disabled>
+
+          <span class="material-icons-outlined">
+            chevron_left
+          </span>
+
+          Previous
+
+        </button>
+
+
+        <span id="activityPageInfo">
+
+          Page 1 of 1
+
+        </span>
+
+
+        <button
+          type="button"
+          id="activityNextPage"
+          class="btn-secondary"
+          disabled>
+
+          Next
+
+          <span class="material-icons-outlined">
+            chevron_right
+          </span>
+
+        </button>
+
+
+      </div>
+
+    </div>
+
+
+  </div>
+
+</div>

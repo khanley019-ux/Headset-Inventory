@@ -1,0 +1,1012 @@
+<script>
+
+  // =========================================
+  // IT ACTIVITY REPORT
+  // =========================================
+
+  let activityLogs = [];
+
+  let filteredActivityLogs = [];
+
+  let activityCurrentPage = 1;
+
+  const activityRowsPerPage = 10;
+
+
+  // =========================================
+  // LOAD ACTIVITY LOGS
+  // =========================================
+
+  function loadActivityLogs() {
+
+    google.script.run
+
+      .withSuccessHandler(function(data) {
+
+        activityLogs =
+          Array.isArray(data)
+            ? data
+            : [];
+
+        filteredActivityLogs =
+          activityLogs.slice();
+
+        activityCurrentPage = 1;
+
+        populateActivityFilters();
+
+        updateActivitySummary();
+
+        renderActivityLogs();
+
+      })
+
+      .withFailureHandler(function(error) {
+
+        console.error(
+          "Activity Logs error:",
+          error
+        );
+
+        const body =
+          document.getElementById(
+            "activityLogsBody"
+          );
+
+        if (body) {
+
+          body.innerHTML = `
+            <tr>
+              <td
+                colspan="7"
+                class="transactions-loading">
+
+                Unable to load activity history.
+
+              </td>
+            </tr>
+          `;
+
+        }
+
+      })
+
+      .getActivityLogs();
+
+  }
+
+
+  // =========================================
+  // SUMMARY
+  // =========================================
+
+  function updateActivitySummary() {
+
+    const total =
+      activityLogs.length;
+
+
+    const staff = new Set();
+
+    const assets = new Set();
+
+
+    activityLogs.forEach(function(log) {
+
+      if (log.fullName) {
+
+        staff.add(
+          String(log.fullName).trim()
+        );
+
+      }
+
+      if (log.assetId) {
+
+        assets.add(
+          String(log.assetId).trim()
+        );
+
+      }
+
+    });
+
+
+    const today =
+      new Date();
+
+    today.setHours(
+      0,
+      0,
+      0,
+      0
+    );
+
+
+    const todayCount =
+      activityLogs.filter(function(log) {
+
+        if (!log.timestamp) {
+          return false;
+        }
+
+        const date =
+          new Date(log.timestamp);
+
+        date.setHours(
+          0,
+          0,
+          0,
+          0
+        );
+
+        return date.getTime() ===
+          today.getTime();
+
+      }).length;
+
+
+    const totalElement =
+      document.getElementById(
+        "activityTotal"
+      );
+
+    const staffElement =
+      document.getElementById(
+        "activityITStaff"
+      );
+
+    const headsetElement =
+      document.getElementById(
+        "activityHeadsets"
+      );
+
+    const todayElement =
+      document.getElementById(
+        "activityToday"
+      );
+
+
+    if (totalElement) {
+
+      totalElement.textContent =
+        total;
+
+    }
+
+
+    if (staffElement) {
+
+      staffElement.textContent =
+        staff.size;
+
+    }
+
+
+    if (headsetElement) {
+
+      headsetElement.textContent =
+        assets.size;
+
+    }
+
+
+    if (todayElement) {
+
+      todayElement.textContent =
+        todayCount;
+
+    }
+
+  }
+
+
+  // =========================================
+  // POPULATE FILTERS
+  // =========================================
+
+  function populateActivityFilters() {
+
+    const staffFilter =
+      document.getElementById(
+        "activityStaffFilter"
+      );
+
+    const actionFilter =
+      document.getElementById(
+        "activityActionFilter"
+      );
+
+
+    if (!staffFilter ||
+        !actionFilter) {
+
+      return;
+
+    }
+
+
+    const currentStaff =
+      staffFilter.value;
+
+    const currentAction =
+      actionFilter.value;
+
+
+    const staffSet =
+      new Set();
+
+    const actionSet =
+      new Set();
+
+
+    activityLogs.forEach(function(log) {
+
+      if (log.fullName) {
+
+        staffSet.add(
+          String(log.fullName).trim()
+        );
+
+      }
+
+      if (log.action) {
+
+        actionSet.add(
+          String(log.action).trim()
+        );
+
+      }
+
+    });
+
+
+    staffFilter.innerHTML = `
+      <option value="">
+        All IT Staff
+      </option>
+    `;
+
+
+    Array.from(staffSet)
+      .sort()
+      .forEach(function(name) {
+
+        const option =
+          document.createElement("option");
+
+        option.value =
+          name;
+
+        option.textContent =
+          name;
+
+        staffFilter.appendChild(
+          option
+        );
+
+      });
+
+
+    actionFilter.innerHTML = `
+      <option value="">
+        All Actions
+      </option>
+    `;
+
+
+    Array.from(actionSet)
+      .sort()
+      .forEach(function(action) {
+
+        const option =
+          document.createElement("option");
+
+        option.value =
+          action;
+
+        option.textContent =
+          action;
+
+        actionFilter.appendChild(
+          option
+        );
+
+      });
+
+
+    staffFilter.value =
+      currentStaff;
+
+    actionFilter.value =
+      currentAction;
+
+  }
+
+
+  // =========================================
+  // FILTER ACTIVITY LOGS
+  // =========================================
+
+  function filterActivityLogs() {
+
+    const search =
+      (
+        document.getElementById(
+          "activitySearch"
+        )?.value || ""
+      )
+      .trim()
+      .toLowerCase();
+
+
+    const staff =
+      document.getElementById(
+        "activityStaffFilter"
+      )?.value || "";
+
+
+    const action =
+      document.getElementById(
+        "activityActionFilter"
+      )?.value || "";
+
+
+    const dateFilter =
+      document.getElementById(
+        "activityDateFilter"
+      )?.value || "";
+
+
+    const now =
+      new Date();
+
+
+    filteredActivityLogs =
+      activityLogs.filter(function(log) {
+
+
+        // SEARCH
+
+        if (search) {
+
+          const text = [
+
+            log.username,
+            log.fullName,
+            log.position,
+            log.action,
+            log.assetId,
+            log.employee,
+            log.description
+
+          ]
+          .join(" ")
+          .toLowerCase();
+
+
+          if (!text.includes(search)) {
+
+            return false;
+
+          }
+
+        }
+
+
+        // STAFF
+
+        if (
+          staff &&
+          String(log.fullName || "").trim()
+            !== staff
+        ) {
+
+          return false;
+
+        }
+
+
+        // ACTION
+
+        if (
+          action &&
+          String(log.action || "").trim()
+            !== action
+        ) {
+
+          return false;
+
+        }
+
+
+        // DATE FILTER
+
+        if (dateFilter) {
+
+          if (!log.timestamp) {
+
+            return false;
+
+          }
+
+
+          const logDate =
+            new Date(log.timestamp);
+
+
+          if (dateFilter === "today") {
+
+            return (
+              logDate.getFullYear() ===
+                now.getFullYear() &&
+
+              logDate.getMonth() ===
+                now.getMonth() &&
+
+              logDate.getDate() ===
+                now.getDate()
+            );
+
+          }
+
+
+          if (dateFilter === "week") {
+
+            const startOfWeek =
+              new Date(now);
+
+            const day =
+              startOfWeek.getDay();
+
+            startOfWeek.setDate(
+              startOfWeek.getDate() - day
+            );
+
+            startOfWeek.setHours(
+              0,
+              0,
+              0,
+              0
+            );
+
+
+            return logDate >=
+              startOfWeek;
+
+          }
+
+
+          if (dateFilter === "month") {
+
+            return (
+              logDate.getFullYear() ===
+                now.getFullYear() &&
+
+              logDate.getMonth() ===
+                now.getMonth()
+            );
+
+          }
+
+        }
+
+
+        return true;
+
+      });
+
+
+    activityCurrentPage = 1;
+
+    renderActivityLogs();
+
+  }
+
+
+  // =========================================
+  // RENDER TABLE
+  // =========================================
+
+  function renderActivityLogs() {
+
+    const body =
+      document.getElementById(
+        "activityLogsBody"
+      );
+
+
+    if (!body) {
+
+      return;
+
+    }
+
+
+    body.innerHTML = "";
+
+
+    if (
+      filteredActivityLogs.length ===
+      0
+    ) {
+
+      body.innerHTML = `
+        <tr>
+          <td
+            colspan="7"
+            class="transactions-loading">
+
+            No activity records found.
+
+          </td>
+        </tr>
+      `;
+
+
+      updateActivityPagination();
+
+      return;
+
+    }
+
+
+    const start =
+      (
+        activityCurrentPage - 1
+      ) *
+      activityRowsPerPage;
+
+
+    const end =
+      start +
+      activityRowsPerPage;
+
+
+    const pageLogs =
+      filteredActivityLogs.slice(
+        start,
+        end
+      );
+
+
+    pageLogs.forEach(function(log) {
+
+      const row =
+        document.createElement("tr");
+
+
+      row.innerHTML = `
+
+        <td>
+          ${formatActivityDate(log.timestamp)}
+        </td>
+
+        <td>
+          ${escapeActivityHtml(
+            log.fullName ||
+            log.username ||
+            "Unknown"
+          )}
+        </td>
+
+        <td>
+          ${escapeActivityHtml(
+            log.position ||
+            "IT Staff"
+          )}
+        </td>
+
+        <td>
+          <strong>
+            ${escapeActivityHtml(
+              log.action ||
+              ""
+            )}
+          </strong>
+        </td>
+
+        <td>
+          ${escapeActivityHtml(
+            log.assetId ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeActivityHtml(
+            log.employee ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeActivityHtml(
+            log.description ||
+            "-"
+          )}
+        </td>
+
+      `;
+
+
+      body.appendChild(row);
+
+    });
+
+
+    updateActivityPagination();
+
+  }
+
+
+  // =========================================
+  // PAGINATION
+  // =========================================
+
+  function updateActivityPagination() {
+
+    const total =
+      filteredActivityLogs.length;
+
+
+    const totalPages =
+      Math.max(
+        1,
+        Math.ceil(
+          total /
+          activityRowsPerPage
+        )
+      );
+
+
+    if (
+      activityCurrentPage >
+      totalPages
+    ) {
+
+      activityCurrentPage =
+        totalPages;
+
+    }
+
+
+    const info =
+      document.getElementById(
+        "activityPaginationInfo"
+      );
+
+
+    const pageInfo =
+      document.getElementById(
+        "activityPageInfo"
+      );
+
+
+    const previous =
+      document.getElementById(
+        "activityPreviousPage"
+      );
+
+
+    const next =
+      document.getElementById(
+        "activityNextPage"
+      );
+
+
+    if (info) {
+
+      if (total === 0) {
+
+        info.textContent =
+          "Showing 0 activities";
+
+      } else {
+
+        const start =
+          (
+            activityCurrentPage - 1
+          ) *
+          activityRowsPerPage +
+          1;
+
+        const end =
+          Math.min(
+            activityCurrentPage *
+              activityRowsPerPage,
+            total
+          );
+
+
+        info.textContent =
+          "Showing " +
+          start +
+          "-" +
+          end +
+          " of " +
+          total +
+          " activities";
+
+      }
+
+    }
+
+
+    if (pageInfo) {
+
+      pageInfo.textContent =
+        "Page " +
+        activityCurrentPage +
+        " of " +
+        totalPages;
+
+    }
+
+
+    if (previous) {
+
+      previous.disabled =
+        activityCurrentPage <= 1;
+
+    }
+
+
+    if (next) {
+
+      next.disabled =
+        activityCurrentPage >=
+        totalPages;
+
+    }
+
+  }
+
+
+  // =========================================
+  // DATE FORMAT
+  // =========================================
+
+  function formatActivityDate(value) {
+
+    if (!value) {
+
+      return "-";
+
+    }
+
+
+    const date =
+      new Date(value);
+
+
+    if (
+      isNaN(
+        date.getTime()
+      )
+    ) {
+
+      return String(value);
+
+    }
+
+
+    return date.toLocaleString();
+
+  }
+
+
+  // =========================================
+  // HTML ESCAPE
+  // =========================================
+
+  function escapeActivityHtml(value) {
+
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+  }
+
+
+  // =========================================
+  // INITIALIZE REPORT EVENTS
+  // =========================================
+
+  function initializeActivityReport() {
+
+    const search =
+      document.getElementById(
+        "activitySearch"
+      );
+
+
+    const staff =
+      document.getElementById(
+        "activityStaffFilter"
+      );
+
+
+    const action =
+      document.getElementById(
+        "activityActionFilter"
+      );
+
+
+    const date =
+      document.getElementById(
+        "activityDateFilter"
+      );
+
+
+    const clear =
+      document.getElementById(
+        "btnClearActivityFilters"
+      );
+
+
+    const previous =
+      document.getElementById(
+        "activityPreviousPage"
+      );
+
+
+    const next =
+      document.getElementById(
+        "activityNextPage"
+      );
+
+
+    if (search) {
+
+      search.addEventListener(
+        "input",
+        filterActivityLogs
+      );
+
+    }
+
+
+    if (staff) {
+
+      staff.addEventListener(
+        "change",
+        filterActivityLogs
+      );
+
+    }
+
+
+    if (action) {
+
+      action.addEventListener(
+        "change",
+        filterActivityLogs
+      );
+
+    }
+
+
+    if (date) {
+
+      date.addEventListener(
+        "change",
+        filterActivityLogs
+      );
+
+    }
+
+
+    if (clear) {
+
+      clear.addEventListener(
+        "click",
+        function() {
+
+          if (search) {
+
+            search.value = "";
+
+          }
+
+          if (staff) {
+
+            staff.value = "";
+
+          }
+
+          if (action) {
+
+            action.value = "";
+
+          }
+
+          if (date) {
+
+            date.value = "";
+
+          }
+
+          filterActivityLogs();
+
+        }
+      );
+
+    }
+
+
+    if (previous) {
+
+      previous.addEventListener(
+        "click",
+        function() {
+
+          if (
+            activityCurrentPage >
+            1
+          ) {
+
+            activityCurrentPage--;
+
+            renderActivityLogs();
+
+          }
+
+        }
+      );
+
+    }
+
+
+    if (next) {
+
+      next.addEventListener(
+        "click",
+        function() {
+
+          const totalPages =
+            Math.max(
+              1,
+              Math.ceil(
+                filteredActivityLogs.length /
+                activityRowsPerPage
+              )
+            );
+
+
+          if (
+            activityCurrentPage <
+            totalPages
+          ) {
+
+            activityCurrentPage++;
+
+            renderActivityLogs();
+
+          }
+
+        }
+      );
+
+    }
+
+  }
+
+
+  // =========================================
+  // INITIALIZE WHEN PAGE LOADS
+  // =========================================
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+      initializeActivityReport();
+
+    }
+  );
+
+</script>
