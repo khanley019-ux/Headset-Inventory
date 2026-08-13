@@ -1,10 +1,20 @@
+
 <div id="returnHeadsetModal" class="modal" style="display:none;">
 
   <div class="modal-content">
 
+    <!-- =========================================
+         HEADER
+         ========================================= -->
+
     <div class="modal-header">
 
-      <h2>Return Headset</h2>
+      <div>
+        <h2>Return Headset</h2>
+        <p class="modal-subtitle">
+          Process a returned headset
+        </p>
+      </div>
 
       <button
         class="modal-close"
@@ -19,37 +29,32 @@
     </div>
 
 
+    <!-- =========================================
+         BODY
+         ========================================= -->
+
     <div class="modal-body">
 
-      <div class="form-group">
-
-        <label>Date Returned</label>
-
-        <input
-          type="date"
-          id="returnDate"
-          readonly>
-
-      </div>
-
+      <!-- ASSET ID -->
 
       <div class="form-group">
 
-        <label>Asset ID</label>
+        <label for="returnAssetId">
+          Asset ID
+        </label>
 
-        <div style="display:flex; gap:8px;">
+        <div class="input-with-button">
 
           <input
             type="text"
             id="returnAssetId"
-            placeholder="Enter Asset ID (e.g. HS-0143)"
-            autocomplete="off"
-            style="flex:1;">
+            placeholder="Enter Asset ID e.g. HS-0143"
+            autocomplete="off">
 
           <button
             type="button"
-            class="btn-secondary"
-            onclick="searchReturnAsset()">
+            class="btn-icon"
+            onclick="searchReturnHeadset()">
 
             <span class="material-icons-outlined">
               search
@@ -62,9 +67,13 @@
       </div>
 
 
+      <!-- AGENT NAME -->
+
       <div class="form-group">
 
-        <label>Agent Name</label>
+        <label for="returnAgentName">
+          Agent Name
+        </label>
 
         <input
           type="text"
@@ -75,35 +84,13 @@
       </div>
 
 
-      <div class="form-group">
-
-        <label>Headset Brand</label>
-
-        <input
-          type="text"
-          id="returnHeadsetBrand"
-          readonly
-          placeholder="Automatically filled">
-
-      </div>
-
+      <!-- STATUS UPON RETURN -->
 
       <div class="form-group">
 
-        <label>Current Status</label>
-
-        <input
-          type="text"
-          id="returnCurrentStatus"
-          readonly
-          placeholder="Automatically filled">
-
-      </div>
-
-
-      <div class="form-group">
-
-        <label>Status Upon Return</label>
+        <label for="returnStatus">
+          Status Upon Return
+        </label>
 
         <select id="returnStatus">
 
@@ -136,36 +123,58 @@
       </div>
 
 
-      <div class="form-group">
-
-        <label>Checked By</label>
-
-        <input
-          type="text"
-          id="returnCheckedBy"
-          placeholder="Enter your name"
-          autocomplete="off">
-
-      </div>
-
+      <!-- REMARKS -->
 
       <div class="form-group">
 
-        <label>Remarks</label>
+        <label for="returnRemarks">
+          Remarks
+          <span class="optional">
+            Optional
+          </span>
+        </label>
 
         <textarea
           id="returnRemarks"
           rows="3"
-          placeholder="Enter remarks (optional)"></textarea>
+          placeholder="Enter remarks if needed..."></textarea>
 
       </div>
+
+
+      <!-- =========================================
+           HIDDEN SYSTEM VALUES
+           ========================================= -->
+
+      <!--
+        These values are still used by JavaScript
+        and the backend, but they are no longer
+        displayed to the IT staff.
+      -->
+
+      <input
+        type="hidden"
+        id="returnHeadsetBrand">
+
+      <input
+        type="hidden"
+        id="returnCurrentStatus">
+
+      <input
+        type="hidden"
+        id="returnCheckedBy">
 
     </div>
 
 
+    <!-- =========================================
+         FOOTER
+         ========================================= -->
+
     <div class="modal-footer">
 
       <button
+        type="button"
         class="btn-secondary"
         onclick="closeReturnHeadsetModal()">
 
@@ -175,6 +184,7 @@
 
 
       <button
+        type="button"
         class="btn-primary"
         id="btnReturnHeadset"
         onclick="saveReturnHeadset()">
