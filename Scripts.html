@@ -281,63 +281,6 @@ function logout() {
 
 
   // =========================================
-  // HIDE ALL IT PAGES
-  // =========================================
-
-  const dashboardPage =
-    document.getElementById("dashboard-page");
-
-  const inventoryPage =
-    document.getElementById("inventory-page");
-
-  const transactionPage =
-    document.getElementById(
-      "transaction-history-page"
-    );
-
-  const reportsPage =
-    document.getElementById("reports-page");
-
-
-  if (dashboardPage) {
-    dashboardPage.style.display = "none";
-  }
-
-  if (inventoryPage) {
-    inventoryPage.style.display = "none";
-  }
-
-  if (transactionPage) {
-    transactionPage.style.display = "none";
-  }
-
-  if (reportsPage) {
-    reportsPage.style.display = "none";
-  }
-
-
-  // =========================================
-  // REMOVE ACTIVE SIDEBAR STATE
-  // =========================================
-
-  document
-    .getElementById("menuDashboard")
-    ?.classList.remove("active");
-
-  document
-    .getElementById("menuInventory")
-    ?.classList.remove("active");
-
-  document
-    .getElementById("menuTransactions")
-    ?.classList.remove("active");
-
-  document
-    .getElementById("menuReports")
-    ?.classList.remove("active");
-
-
-  // =========================================
   // HIDE IT SIDEBAR
   // =========================================
 
@@ -362,7 +305,19 @@ function logout() {
 
 
   // =========================================
-  // SHOW PUBLIC LOGIN BUTTON
+  // HIDE LOGIN SCREEN
+  // =========================================
+
+  const loginContainer =
+    document.getElementById("login-container");
+
+  if (loginContainer) {
+    loginContainer.style.display = "none";
+  }
+
+
+  // =========================================
+  // SHOW PUBLIC IT LOGIN BUTTON
   // =========================================
 
   const loginButton =
@@ -374,15 +329,67 @@ function logout() {
 
 
   // =========================================
-  // HIDE LOGIN SCREEN
+  // RESET ALL PAGES
   // =========================================
 
-  const loginContainer =
-    document.getElementById("login-container");
+  const dashboardPage =
+    document.getElementById("dashboard-page");
 
-  if (loginContainer) {
-    loginContainer.style.display = "none";
+  const inventoryPage =
+    document.getElementById("inventory-page");
+
+  const transactionPage =
+    document.getElementById(
+      "transaction-history-page"
+    );
+
+  const reportsPage =
+    document.getElementById("reports-page");
+
+
+  // Hide IT-only pages
+
+  if (inventoryPage) {
+    inventoryPage.style.display = "none";
   }
+
+  if (transactionPage) {
+    transactionPage.style.display = "none";
+  }
+
+  if (reportsPage) {
+    reportsPage.style.display = "none";
+  }
+
+
+  // =========================================
+  // SHOW PUBLIC DASHBOARD
+  // =========================================
+
+  if (dashboardPage) {
+    dashboardPage.style.display = "block";
+  }
+
+
+  // =========================================
+  // RESET SIDEBAR ACTIVE STATE
+  // =========================================
+
+  document
+    .getElementById("menuDashboard")
+    ?.classList.remove("active");
+
+  document
+    .getElementById("menuInventory")
+    ?.classList.remove("active");
+
+  document
+    .getElementById("menuTransactions")
+    ?.classList.remove("active");
+
+  document
+    .getElementById("menuReports")
+    ?.classList.remove("active");
 
 
   // =========================================
@@ -426,14 +433,16 @@ function logout() {
   // =========================================
 
   const userName =
-    document.getElementById(
-      "topbarUserName"
-    );
+    document.getElementById("topbarUserName");
 
   const userPosition =
-    document.getElementById(
-      "topbarUserPosition"
-    );
+    document.getElementById("topbarUserPosition");
+
+  const profileMenuName =
+    document.getElementById("profileMenuName");
+
+  const profileMenuPosition =
+    document.getElementById("profileMenuPosition");
 
 
   if (userName) {
@@ -442,6 +451,26 @@ function logout() {
 
   if (userPosition) {
     userPosition.textContent = "IT Support";
+  }
+
+  if (profileMenuName) {
+    profileMenuName.textContent = "IT Staff";
+  }
+
+  if (profileMenuPosition) {
+    profileMenuPosition.textContent = "IT Support";
+  }
+
+
+  // =========================================
+  // CLOSE PROFILE MENU
+  // =========================================
+
+  const profileMenu =
+    document.getElementById("userProfileMenu");
+
+  if (profileMenu) {
+    profileMenu.classList.remove("show");
   }
 
 
@@ -457,7 +486,7 @@ function logout() {
 
 
   console.log(
-    "IT USER LOGGED OUT"
+    "IT USER LOGGED OUT - PUBLIC DASHBOARD RESTORED"
   );
 
 }
@@ -4596,6 +4625,33 @@ function openReturnHeadsetModal() {
 
 }
 
+function toggleUserMenu() {
+
+  console.log("USER PROFILE CLICKED");
+
+  const menu =
+    document.getElementById("userProfileMenu");
+
+  if (!menu) {
+
+    console.error(
+      "userProfileMenu element not found."
+    );
+
+    return;
+
+  }
+
+  menu.classList.toggle("show");
+
+  console.log(
+    "Profile menu:",
+    menu.classList.contains("show")
+      ? "OPEN"
+      : "CLOSED"
+  );
+
+}
 
 /**
  * Search a headset by Asset ID.
@@ -4773,6 +4829,208 @@ function closeReturnHeadsetModal() {
 
 }
 
+// =========================================
+// SEARCH RETURN HEADSET
+// =========================================
+
+function searchReturnHeadset() {
+
+  const assetInput =
+    document.getElementById("returnAssetId");
+
+  const agentInput =
+    document.getElementById("returnAgentName");
+
+  const brandInput =
+    document.getElementById("returnHeadsetBrand");
+
+  const statusInput =
+    document.getElementById("returnCurrentStatus");
+
+  if (!assetInput) {
+    console.error("returnAssetId input not found.");
+    return;
+  }
+
+  const assetId =
+    assetInput.value.trim();
+
+  // =========================================
+  // VALIDATION
+  // =========================================
+
+  if (!assetId) {
+
+    alert("Please enter an Asset ID.");
+
+    assetInput.focus();
+
+    return;
+  }
+
+
+  // =========================================
+  // CLEAR PREVIOUS DATA
+  // =========================================
+
+  if (agentInput) {
+    agentInput.value = "";
+  }
+
+  if (brandInput) {
+    brandInput.value = "";
+  }
+
+  if (statusInput) {
+    statusInput.value = "";
+  }
+
+
+  // =========================================
+  // SEARCH BUTTON
+  // =========================================
+
+  const searchButton =
+    assetInput
+      .closest(".input-with-button")
+      ?.querySelector("button");
+
+  if (searchButton) {
+
+    searchButton.disabled = true;
+
+    searchButton.innerHTML = `
+      <span class="material-icons-outlined">
+        hourglass_top
+      </span>
+    `;
+
+  }
+
+
+  // =========================================
+  // CALL APPS SCRIPT
+  // =========================================
+
+  google.script.run
+
+    .withSuccessHandler(function(result) {
+
+      // Restore button
+
+      if (searchButton) {
+
+        searchButton.disabled = false;
+
+        searchButton.innerHTML = `
+          <span class="material-icons-outlined">
+            search
+          </span>
+        `;
+
+      }
+
+
+      // =====================================
+      // NOT FOUND
+      // =====================================
+
+      if (
+        !result ||
+        !result.found
+      ) {
+
+        if (agentInput) {
+          agentInput.value = "";
+        }
+
+        if (brandInput) {
+          brandInput.value = "";
+        }
+
+        if (statusInput) {
+          statusInput.value = "";
+        }
+
+        alert(
+          result &&
+          result.message
+            ? result.message
+            : "Headset could not be found."
+        );
+
+        return;
+      }
+
+
+      // =====================================
+      // FILL RETURN FORM
+      // =====================================
+
+      if (agentInput) {
+
+        agentInput.value =
+          result.agentName || "";
+
+      }
+
+
+      if (brandInput) {
+
+        brandInput.value =
+          result.brand || "";
+
+      }
+
+
+      if (statusInput) {
+
+        statusInput.value =
+          result.status || "";
+
+      }
+
+
+      console.log(
+        "Return headset found:",
+        result
+      );
+
+    })
+
+    .withFailureHandler(function(error) {
+
+      console.error(
+        "Search return headset error:",
+        error
+      );
+
+
+      if (searchButton) {
+
+        searchButton.disabled = false;
+
+        searchButton.innerHTML = `
+          <span class="material-icons-outlined">
+            search
+          </span>
+        `;
+
+      }
+
+
+      alert(
+        error &&
+        error.message
+          ? error.message
+          : "Unable to search for the headset."
+      );
+
+    })
+
+    .searchReturnableHeadset(assetId);
+
+}
 
 /**
  * Save Return transaction.
@@ -4780,53 +5038,58 @@ function closeReturnHeadsetModal() {
 function saveReturnHeadset() {
 
   const assetId =
-    document.getElementById(
-      "returnAssetId"
-    ).value.trim();
-
+    document.getElementById("returnAssetId").value.trim();
 
   const agentName =
-    document.getElementById(
-      "returnAgentName"
-    ).value.trim();
-
+    document.getElementById("returnAgentName").value.trim();
 
   const brand =
-    document.getElementById(
-      "returnHeadsetBrand"
-    ).value.trim();
-
+    document.getElementById("returnHeadsetBrand").value.trim();
 
   const currentStatus =
-    document.getElementById(
-      "returnCurrentStatus"
-    ).value.trim();
-
+    document.getElementById("returnCurrentStatus").value.trim();
 
   const statusUponReturn =
-    document.getElementById(
-      "returnStatus"
-    ).value;
-
-
-  const checkedBy =
-    document.getElementById(
-      "returnCheckedBy"
-    ).value.trim();
-
+    document.getElementById("returnStatus").value;
 
   const remarks =
-    document.getElementById(
-      "returnRemarks"
-    ).value.trim();
+    document.getElementById("returnRemarks").value.trim();
 
 
-  /*
-   * =========================================
-   * VALIDATION
-   * =========================================
-   */
+  // =========================================
+  // GET LOGGED-IN IT USER
+  // =========================================
 
+  const currentUser =
+    window.currentITUser;
+
+
+  if (
+    !currentUser ||
+    !currentUser.success ||
+    !currentUser.fullName
+  ) {
+
+    alert(
+      "Your IT session has expired. Please log in again."
+    );
+
+    return;
+
+  }
+
+
+  // =========================================
+  // AUTOMATIC CHECKED BY
+  // =========================================
+
+  const checkedBy =
+    currentUser.fullName;
+
+
+  // =========================================
+  // VALIDATION
+  // =========================================
 
   if (!assetId) {
 
@@ -4897,22 +5160,9 @@ function saveReturnHeadset() {
   }
 
 
-  if (!checkedBy) {
-
-    alert(
-      "Please enter Checked By."
-    );
-
-    return;
-
-  }
-
-
-  /*
-   * =========================================
-   * SAVE BUTTON
-   * =========================================
-   */
+  // =========================================
+  // SAVE BUTTON
+  // =========================================
 
   const button =
     document.getElementById(
@@ -4920,16 +5170,23 @@ function saveReturnHeadset() {
     );
 
 
-  button.disabled = true;
+  if (button) {
+
+    button.disabled = true;
+
+    button.innerHTML = `
+      <span class="material-icons-outlined">
+        hourglass_top
+      </span>
+      Saving...
+    `;
+
+  }
 
 
-  button.innerHTML = `
-    <span class="material-icons-outlined">
-      hourglass_top
-    </span>
-    Saving...
-  `;
-
+  // =========================================
+  // RETURN DATA
+  // =========================================
 
   const data = {
 
@@ -4942,29 +5199,55 @@ function saveReturnHeadset() {
     checkedBy:
       checkedBy,
 
+    currentITUser: {
+
+      username:
+        currentUser.username || "",
+
+      fullName:
+        currentUser.fullName || "",
+
+      position:
+        currentUser.position || "IT Staff"
+
+    },
+
     remarks:
       remarks
 
   };
 
 
-  /*
-   * =========================================
-   * SEND TO APPS SCRIPT
-   * =========================================
-   */
+  console.log(
+    "RETURN TRANSACTION:",
+    data
+  );
+
+
+  // =========================================
+  // SEND TO APPS SCRIPT
+  // =========================================
 
   google.script.run
 
     .withSuccessHandler(function(result) {
 
-      button.disabled = false;
+      // Restore button
+
+      if (button) {
+
+        button.disabled = false;
+
+        button.innerHTML = `
+          Return Headset
+        `;
+
+      }
 
 
-      button.innerHTML = `
-        Return Headset
-      `;
-
+      // =====================================
+      // CHECK RESULT
+      // =====================================
 
       if (
         !result ||
@@ -4980,9 +5263,9 @@ function saveReturnHeadset() {
       }
 
 
-      /*
-       * Success
-       */
+      // =====================================
+      // SUCCESS
+      // =====================================
 
       alert(
         "Headset returned successfully."
@@ -4992,9 +5275,9 @@ function saveReturnHeadset() {
       closeReturnHeadsetModal();
 
 
-      /*
-       * Refresh Inventory
-       */
+      // =====================================
+      // REFRESH INVENTORY
+      // =====================================
 
       if (
         typeof loadInventoryData ===
@@ -5006,9 +5289,9 @@ function saveReturnHeadset() {
       }
 
 
-      /*
-       * Refresh Dashboard
-       */
+      // =====================================
+      // REFRESH DASHBOARD
+      // =====================================
 
       if (
         typeof loadDashboardStats ===
@@ -5020,9 +5303,9 @@ function saveReturnHeadset() {
       }
 
 
-      /*
-       * Refresh Recent Transactions
-       */
+      // =====================================
+      // REFRESH RECENT TRANSACTIONS
+      // =====================================
 
       if (
         typeof loadRecentTransactions ===
@@ -5030,6 +5313,20 @@ function saveReturnHeadset() {
       ) {
 
         loadRecentTransactions();
+
+      }
+
+
+      // =====================================
+      // REFRESH ACTIVITY REPORT
+      // =====================================
+
+      if (
+        typeof loadActivityLogs ===
+        "function"
+      ) {
+
+        loadActivityLogs();
 
       }
 
@@ -5044,17 +5341,22 @@ function saveReturnHeadset() {
       );
 
 
-      button.disabled = false;
+      if (button) {
 
+        button.disabled = false;
 
-      button.innerHTML = `
-        Return Headset
-      `;
+        button.innerHTML = `
+          Return Headset
+        `;
+
+      }
 
 
       alert(
-        error.message ||
-        "Unable to save return transaction."
+        error &&
+        error.message
+          ? error.message
+          : "Unable to save return transaction."
       );
 
     })
