@@ -181,7 +181,7 @@
 
   <div class="recent-transactions-card reports-card">
 
-    <div class="section-header">
+    <div class="activity-header">
 
       <div>
 
@@ -246,52 +246,67 @@
     </div>
 
 
-    <!-- =======================================
-         PAGINATION
-         ======================================= -->
+<!-- =========================================
+     PAGINATION
+     Same style as Transaction History
+     ========================================= -->
 
-    <div class="pagination-container">
+      <div class="inventory-pagination">
 
-      <div id="activityPaginationInfo">
-        Showing 0 activities
-      </div>
+        <!-- PAGINATION INFO -->
+
+        <div
+          id="activityPaginationInfo"
+          class="pagination-info">
+
+          Showing 0 - 0 of 0
+
+        </div>
 
 
-      <div class="pagination-buttons">
+        <!-- PAGINATION CONTROLS -->
 
-        <button
-          type="button"
-          id="activityPreviousPage"
-          class="btn-secondary"
-          disabled>
+        <div class="pagination-controls">
 
-          <span class="material-icons-outlined">
-            chevron_left
+          <button
+            type="button"
+            id="activityPreviousPage"
+            class="pagination-btn"
+            disabled>
+
+            <span class="material-icons-outlined">
+              chevron_left
+            </span>
+
+            Previous
+
+          </button>
+
+
+          <span
+            id="activityPageInfo"
+            class="pagination-page">
+
+            Page 1 of 1
+
           </span>
 
-          Previous
 
-        </button>
+          <button
+            type="button"
+            id="activityNextPage"
+            class="pagination-btn"
+            disabled>
 
+            Next
 
-        <span id="activityPageInfo">
-          Page 1 of 1
-        </span>
+            <span class="material-icons-outlined">
+              chevron_right
+            </span>
 
+          </button>
 
-        <button
-          type="button"
-          id="activityNextPage"
-          class="btn-secondary"
-          disabled>
-
-          Next
-
-          <span class="material-icons-outlined">
-            chevron_right
-          </span>
-
-        </button>
+        </div>
 
       </div>
 

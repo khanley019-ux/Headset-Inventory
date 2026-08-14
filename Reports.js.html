@@ -17,16 +17,27 @@
   // LOAD ACTIVITY LOGS
   // =========================================
 
-  function loadActivityLogs() {
+    function loadActivityLogs() {
+
+    console.log("LOAD ACTIVITY LOGS STARTED");
 
     google.script.run
 
       .withSuccessHandler(function(data) {
 
+        console.log("ACTIVITY DATA RECEIVED:", data);
+        console.log("IS ARRAY:", Array.isArray(data));
+        console.log("ACTIVITY COUNT:", data ? data.length : 0);
+
         activityLogs =
           Array.isArray(data)
             ? data
             : [];
+
+        console.log(
+          "activityLogs AFTER ASSIGNMENT:",
+          activityLogs
+        );
 
         filteredActivityLogs =
           activityLogs.slice();
@@ -723,7 +734,7 @@
       if (total === 0) {
 
         info.textContent =
-          "Showing 0 activities";
+          "Showing 0 - 0 of 0";
 
       } else {
 
@@ -741,15 +752,13 @@
             total
           );
 
-
         info.textContent =
           "Showing " +
           start +
-          "-" +
+          " - " +
           end +
           " of " +
-          total +
-          " activities";
+          total;
 
       }
 
@@ -783,9 +792,7 @@
 
     }
 
-  }
-
-
+  }   
   // =========================================
   // DATE FORMAT
   // =========================================

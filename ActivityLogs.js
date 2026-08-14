@@ -247,54 +247,14 @@ function saveActivityLog(activity) {
  * GET ACTIVITY LOGS
  * =========================================
  */
-function getActivityLogs() {
-
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-
-  const sheet = ss.getSheetByName("Activity Logs");
-
-  if (!sheet || sheet.getLastRow() < 2) {
-
-    return [];
-
-  }
-
-  const lastRow = sheet.getLastRow();
-
-  const values =
-    sheet.getRange(
-      2,
-      1,
-      lastRow - 1,
-      8
-    ).getValues();
-
-  return values.map(function(row) {
-
-    return {
-
-      timestamp: row[0],
-
-      username: row[1],
-
-      fullName: row[2],
-
-      position: row[3],
-
-      action: row[4],
-
-      assetId: row[5],
-
-      employee: row[6],
-
-      description: row[7]
-
-    };
-
-  }).reverse();
-
-}
-
+/**
+ * =========================================
+ * GET ACTIVITY LOGS
+ * =========================================
+ *
+ * Returns all Activity Logs for the
+ * IT Activity Report.
+ */
 function getActivityLogs() {
 
   const ss =
@@ -302,6 +262,11 @@ function getActivityLogs() {
 
   const sheet =
     ss.getSheetByName("Activity Logs");
+
+
+  // =========================================
+  // SHEET CHECK
+  // =========================================
 
   if (!sheet) {
 
@@ -311,28 +276,27 @@ function getActivityLogs() {
 
   }
 
+
+  // =========================================
+  // CHECK FOR DATA
+  // =========================================
+
   const lastRow =
     sheet.getLastRow();
 
-  // Header only / no records
+
   if (lastRow < 2) {
+
     return [];
+
   }
 
-  /*
-   * Activity Logs:
-   *
-   * A = Timestamp
-   * B = IT Username
-   * C = IT Full Name
-   * D = IT Position
-   * E = Action
-   * F = Asset ID
-   * G = Employee
-   * H = Description
-   */
 
-  const data =
+  // =========================================
+  // READ ACTIVITY LOGS
+  // =========================================
+
+  const values =
     sheet
       .getRange(
         2,
@@ -340,58 +304,92 @@ function getActivityLogs() {
         lastRow - 1,
         8
       )
-      .getDisplayValues();
+      .getValues();
 
 
-  const logs = [];
+  // =========================================
+  // CONVERT TO SAFE JSON OBJECTS
+  // =========================================
 
+  const logs =
+    values
 
-  data.forEach(function(row) {
+      .filter(function(row) {
 
-    // Ignore completely empty rows
-    if (
-      row.every(function(value) {
-        return String(value).trim() === "";
+        return row.some(function(value) {
+
+          return String(value || "").trim() !== "";
+
+        });
+
       })
-    ) {
-      return;
-    }
+
+      .map(function(row) {
+
+        let timestamp = "";
+
+        if (row[0]) {
+
+          if (row[0] instanceof Date) {
+
+            timestamp =
+              row[0].toISOString();
+
+          } else {
+
+            timestamp =
+              String(row[0]);
+
+          }
+
+        }
 
 
-    logs.push({
+        return {
 
-      timestamp:
-        row[0] || "",
+          timestamp: timestamp,
 
-      username:
-        row[1] || "",
+          username:
+            String(row[1] || "").trim(),
 
-      fullName:
-        row[2] || "",
+          fullName:
+            String(row[2] || "").trim(),
 
-      position:
-        row[3] || "",
+          position:
+            String(row[3] || "").trim(),
 
-      action:
-        row[4] || "",
+          action:
+            String(row[4] || "").trim(),
 
-      assetId:
-        row[5] || "",
+          assetId:
+            String(row[5] || "").trim(),
 
-      employee:
-        row[6] || "",
+          employee:
+            String(row[6] || "").trim(),
 
-      description:
-        row[7] || ""
+          description:
+            String(row[7] || "").trim()
 
-    });
+        };
 
-  });
+      });
+
+
+  // =========================================
+  // NEWEST ACTIVITY FIRST
+  // =========================================
+
+  logs.reverse();
 
 
   console.log(
     "Activity Logs retrieved: " +
     logs.length
+  );
+
+
+  console.log(
+    JSON.stringify(logs)
   );
 
 
