@@ -120,6 +120,8 @@ function login() {
         loginContainer.style.display = "none";
       }
 
+      document.body.classList.remove("login-open");
+
 
       // =======================================
       // HIDE PUBLIC LOGIN BUTTON
@@ -4166,40 +4168,186 @@ function issueHeadset() {
 
 function viewHeadset(button) {
 
-  const assetId = button.dataset.assetid.trim();
+  const assetId =
+    button.dataset.assetid.trim();
 
   console.log("Asset ID:", assetId);
 
+
   google.script.run
+
     .withSuccessHandler(function(headset) {
 
+      console.log(
+        "Headset data received:",
+        headset
+      );
+
+
       if (!headset) {
-        alert("Headset not found: " + assetId);
+
+        alert(
+          "Headset not found: " +
+          assetId
+        );
+
         return;
+
       }
 
-      document.getElementById("detailAssetId").textContent = headset.assetId || "-";
-      document.getElementById("detailBrand").textContent = headset.brand || "-";
-      document.getElementById("detailModel").textContent = headset.model || "-";
-      document.getElementById("detailSerial").textContent = headset.serialNumber || "-";
-      document.getElementById("detailStatus").textContent = headset.status || "-";
-      document.getElementById("detailCondition").textContent = headset.condition || "-";
-      document.getElementById("detailAssigned").textContent = headset.assignedTo || "-";
-      document.getElementById("detailLastUser").textContent = headset.lastUser || "-";
-      document.getElementById("detailDateIssued").textContent = headset.dateIssued || "-";
-      document.getElementById("detailDateReturned").textContent = headset.dateReturned || "-";
-      document.getElementById("detailPurchaseDate").textContent = headset.purchaseDate || "-";
-      document.getElementById("detailPurchasePrice").textContent = headset.purchasePrice || "-";
-      document.getElementById("detailAge").textContent = headset.ageMonths || "-";
-      document.getElementById("detailDepreciated").textContent = headset.depreciatedValue || "-";
 
-      document.getElementById("headsetDetailsModal").style.display = "flex";
+      // =========================================
+      // HELPER
+      // =========================================
+
+      function setDetail(id, value) {
+
+        const element =
+          document.getElementById(id);
+
+
+        if (!element) {
+
+          console.error(
+            "DETAIL ELEMENT NOT FOUND:",
+            id
+          );
+
+          return;
+
+        }
+
+
+        element.textContent =
+          value || "-";
+
+      }
+
+
+      // =========================================
+      // POPULATE DETAILS
+      // =========================================
+
+      setDetail(
+        "detailAssetId",
+        headset.assetId
+      );
+
+      setDetail(
+        "detailBrand",
+        headset.brand
+      );
+
+      setDetail(
+        "detailModel",
+        headset.model
+      );
+
+      setDetail(
+        "detailSerial",
+        headset.serialNumber
+      );
+
+      setDetail(
+        "detailStatus",
+        headset.status
+      );
+
+      setDetail(
+        "detailCondition",
+        headset.condition
+      );
+
+      setDetail(
+        "detailAssigned",
+        headset.assignedTo
+      );
+
+      setDetail(
+        "detailLastUser",
+        headset.lastUser
+      );
+
+      setDetail(
+        "detailDateIssued",
+        headset.dateIssued
+      );
+
+      setDetail(
+        "detailDateReturned",
+        headset.dateReturned
+      );
+
+      setDetail(
+        "detailPurchaseDate",
+        headset.purchaseDate
+      );
+
+      setDetail(
+        "detailPurchasePrice",
+        headset.purchasePrice
+      );
+
+      setDetail(
+    "detailAge",
+    headset.ageMonths
+      ? headset.ageMonths + " months"
+      : "-"
+  );
+
+      setDetail(
+        "detailDepreciated",
+        headset.depreciatedValue
+      );
+
+
+      // =========================================
+      // OPEN MODAL
+      // =========================================
+
+      const modal =
+        document.getElementById(
+          "headsetDetailsModal"
+        );
+
+
+      if (!modal) {
+
+        console.error(
+          "headsetDetailsModal was not found."
+        );
+
+        alert(
+          "Headset details modal was not found."
+        );
+
+        return;
+
+      }
+
+
+      modal.style.display =
+        "flex";
 
     })
+
     .withFailureHandler(function(error) {
-      alert(error.message);
+
+      console.error(
+        "getHeadsetByAssetId error:",
+        error
+      );
+
+      alert(
+        error.message ||
+        "Unable to load headset details."
+      );
+
     })
-    .getHeadsetByAssetId(assetId);
+
+    .getHeadsetByAssetId(
+      assetId
+    );
 
 }
 

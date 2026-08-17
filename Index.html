@@ -87,6 +87,8 @@
         
         <?!= include("Reports"); ?>
 
+        <?!= include('HeadsetDetailsModal'); ?>
+
 
       </main>
 
@@ -172,7 +174,6 @@
 
       console.log("Opening IT Login");
 
-
       const loginContainer =
         document.getElementById("login-container");
 
@@ -180,28 +181,50 @@
         document.getElementById("itLoginButton");
 
 
+      // =========================================
+      // HIDE PUBLIC LOGIN BUTTON
+      // =========================================
+
       if (loginButton) {
-
         loginButton.style.display = "none";
-
       }
 
+
+      // =========================================
+      // OPEN LOGIN AS INDEPENDENT VIEWPORT
+      // =========================================
 
       if (loginContainer) {
 
         loginContainer.style.display = "flex";
 
+        document.body.classList.add("login-open");
+
       }
 
+
+      // =========================================
+      // ALWAYS START LOGIN AT THE TOP
+      // =========================================
+
+      loginContainer?.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "instant"
+      });
+
+
+      // =========================================
+      // FOCUS USERNAME
+      // =========================================
 
       const username =
         document.getElementById("username");
 
-
       if (username) {
-
-        username.focus();
-
+        setTimeout(function() {
+          username.focus();
+        }, 50);
       }
 
     }
@@ -209,6 +232,8 @@
 
     function closeITLogin() {
 
+      console.log("Closing IT Login");
+
       const loginContainer =
         document.getElementById("login-container");
 
@@ -216,17 +241,28 @@
         document.getElementById("itLoginButton");
 
 
+      // =========================================
+      // HIDE LOGIN
+      // =========================================
+
       if (loginContainer) {
-
         loginContainer.style.display = "none";
-
       }
 
 
+      // =========================================
+      // RESTORE BODY SCROLLING
+      // =========================================
+
+      document.body.classList.remove("login-open");
+
+
+      // =========================================
+      // SHOW PUBLIC LOGIN BUTTON
+      // =========================================
+
       if (loginButton) {
-
         loginButton.style.display = "block";
-
       }
 
     }
